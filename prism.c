@@ -324,31 +324,6 @@ void CopyWNotice()
 struct Process *myProcess;
 struct Window *svWindowPtr;
 
-/*----------------------------------------------------------------------*/
-/* Yes, this is it, the MAIN PROGRAM:                                   */
-/*----------------------------------------------------------------------*/
-int main( int argc, char *argv[] )
-{
-    DPInit( argc, argv );  /* initialization code */
-
-    NewIMode( IM_draw );
-    SetAirBRad( PMapX( 24 ) ); /* also brings in the drawing overlay*/
-
-#ifdef DOWB
-    if ( loadAFile ) LoadPic();
-#endif
-
-    CopyWNotice();
-
-    //loaded = YES;
-
-    PListen(); 		/* this is the program */
-
-    if ( !haveWBench ) BootIT();
-
-    else CloseDisplay();
-}
-
 /* Allocate and Free temp Raster --------------- */
 void AllocTmpRas()
 {
@@ -473,5 +448,29 @@ printf("Avail Mem %-27s = %ld (%7ld)\n",s,avmem, avmem - lastAvMem);
 lastAvMem = avmem;
 }
 **/
-
+
+/*----------------------------------------------------------------------*/
+/* Yes, this is it, the MAIN PROGRAM:                                   */
+/*----------------------------------------------------------------------*/
+int main( int argc, char *argv[ ] )
+{
+    DPInit( argc, argv );  /* initialization code */
+
+    NewIMode( IM_draw );
+    SetAirBRad( PMapX( 24 ) ); /* also brings in the drawing overlay*/
+
+#ifdef DOWB
+    if ( loadAFile ) LoadPic( );
+#endif
+
+    CopyWNotice( );
+
+    //loaded = YES;
+
+    PListen( ); 		/* this is the program */
+
+    if ( !haveWBench ) BootIT( );
+
+    else CloseDisplay( );
+}
 

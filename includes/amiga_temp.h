@@ -14,11 +14,11 @@ struct AreaInfo
     WORD   FirstX, FirstY;    /* first point for this polygon */
 };
 
-struct TmpRas
-{
-    BYTE *RasPtr;
-    LONG Size;
-};
+//struct TmpRas
+//{
+//    BYTE *RasPtr;
+//    LONG Size;
+//};
 
 /* unoptimized for 32bit alignment of pointers */
 struct GelsInfo
@@ -36,42 +36,42 @@ struct GelsInfo
     APTR firstBlissObj, lastBlissObj;    /* system use only */
 };
 
-struct RastPort
-{
-    struct  Layer *Layer;
-    struct  BitMap   *BitMap;
-    UWORD  *AreaPtrn;	     /* ptr to areafill pattern */
-    struct  TmpRas *TmpRas;
-    struct  AreaInfo *AreaInfo;
-    struct  GelsInfo *GelsInfo;
-    UBYTE   Mask;	      /* write mask for this raster */
-    BYTE    FgPen;	      /* foreground pen for this raster */
-    BYTE    BgPen;	      /* background pen  */
-    BYTE    AOlPen;	      /* areafill outline pen */
-    BYTE    DrawMode;	      /* drawing mode for fill, lines, and text */
-    BYTE    AreaPtSz;	      /* 2^n words for areafill pattern */
-    BYTE    linpatcnt;	      /* current line drawing pattern preshift */
-    BYTE    dummy;
-    UWORD  Flags;	     /* miscellaneous control bits */
-    UWORD  LinePtrn;	     /* 16 bits for textured lines */
-    WORD   cp_x, cp_y;	     /* current pen position */
-    UBYTE   minterms[ 8 ];
-    WORD   PenWidth;
-    WORD   PenHeight;
-    struct  TextFont *Font;   /* current font address */
-    UBYTE   AlgoStyle;	      /* the algorithmically generated style */
-    UBYTE   TxFlags;	      /* text specific flags */
-    UWORD   TxHeight;	      /* text height */
-    UWORD   TxWidth;	      /* text nominal width */
-    UWORD   TxBaseline;       /* text baseline */
-    WORD    TxSpacing;	      /* text spacing (per character) */
-    APTR    *RP_User;
-    ULONG   longreserved[ 2 ];
-#ifndef GFX_RASTPORT_1_2
-    UWORD   wordreserved[ 7 ];  /* used to be a node */
-    UBYTE   reserved[ 8 ];      /* for future use */
-#endif
-};
+//struct RastPort
+//{
+//    struct  Layer *Layer;
+//    struct  BitMap   *BitMap;
+//    UWORD  *AreaPtrn;	     /* ptr to areafill pattern */
+//    struct  TmpRas *TmpRas;
+//    struct  AreaInfo *AreaInfo;
+//    struct  GelsInfo *GelsInfo;
+//    UBYTE   Mask;	      /* write mask for this raster */
+//    BYTE    FgPen;	      /* foreground pen for this raster */
+//    BYTE    BgPen;	      /* background pen  */
+//    BYTE    AOlPen;	      /* areafill outline pen */
+//    BYTE    DrawMode;	      /* drawing mode for fill, lines, and text */
+//    BYTE    AreaPtSz;	      /* 2^n words for areafill pattern */
+//    BYTE    linpatcnt;	      /* current line drawing pattern preshift */
+//    BYTE    dummy;
+//    UWORD  Flags;	     /* miscellaneous control bits */
+//    UWORD  LinePtrn;	     /* 16 bits for textured lines */
+//    WORD   cp_x, cp_y;	     /* current pen position */
+//    UBYTE   minterms[ 8 ];
+//    WORD   PenWidth;
+//    WORD   PenHeight;
+//    struct  TextFont *Font;   /* current font address */
+//    UBYTE   AlgoStyle;	      /* the algorithmically generated style */
+//    UBYTE   TxFlags;	      /* text specific flags */
+//    UWORD   TxHeight;	      /* text height */
+//    UWORD   TxWidth;	      /* text nominal width */
+//    UWORD   TxBaseline;       /* text baseline */
+//    WORD    TxSpacing;	      /* text spacing (per character) */
+//    APTR    *RP_User;
+//    ULONG   longreserved[ 2 ];
+//#ifndef GFX_RASTPORT_1_2
+//    UWORD   wordreserved[ 7 ];  /* used to be a node */
+//    UBYTE   reserved[ 8 ];      /* for future use */
+//#endif
+//};
 
 /* drawing modes */
 #define JAM1	    0	      /* jam 1 color into raster */
@@ -195,6 +195,81 @@ struct TextAttr
 /* bit 7 is always clear for fonts on the graphics font list */
 #define	FPB_REMOVED	7	/* the font has been removed */
 #define	FPF_REMOVED	(1<<7)
+
+
+#define HIRES 1
+#define CUSTOMSCREEN 2
+#define LACE 3
+
+/* ======================================================================== */
+/* === NewWindow ========================================================== */
+/* ======================================================================== */
+/*
+* Note that the new extension fields have been removed.  Use ExtNewWindow
+* structure below to make use of these fields
+*/
+struct NewWindow
+{
+    WORD LeftEdge, TopEdge;		/* screen dimensions of window */
+    WORD Width, Height;			/* screen dimensions of window */
+
+    UBYTE DetailPen, BlockPen;		/* for bar/border/gadget rendering */
+
+    ULONG IDCMPFlags;			/* User-selected IDCMP flags */
+
+    ULONG Flags;			/* see Window struct for defines */
+
+    /* You supply a linked-list of Gadgets for your Window.
+    *	This list DOES NOT include system Gadgets.  You get the standard
+    *	system Window Gadgets by setting flag-bits in the variable Flags (see
+    *	the bit definitions under the Window structure definition)
+    */
+    struct Gadget *FirstGadget;
+
+    /* the CheckMark is a pointer to the imagery that will be used when
+    * rendering MenuItems of this Window that want to be checkmarked
+    * if this is equal to NULL, you'll get the default imagery
+    */
+    struct Image *CheckMark;
+
+    UBYTE *Title;			  /* the title text for this window */
+
+    /* the Screen pointer is used only if you've defined a CUSTOMSCREEN and
+    * want this Window to open in it.	If so, you pass the address of the
+    * Custom Screen structure in this variable.  Otherwise, this variable
+    * is ignored and doesn't have to be initialized.
+    */
+    struct Screen *Screen;
+
+    /* WFLG_SUPER_BITMAP Window?  If so, put the address of your BitMap
+    * structure in this variable.  If not, this variable is ignored and
+    * doesn't have to be initialized
+    */
+    struct BitMap *BitMap;
+
+    /* the values describe the minimum and maximum sizes of your Windows.
+    * these matter only if you've chosen the WFLG_SIZEGADGET option,
+    * which means that you want to let the User to change the size of
+    * this Window.  You describe the minimum and maximum sizes that the
+    * Window can grow by setting these variables.  You can initialize
+    * any one these to zero, which will mean that you want to duplicate
+    * the setting for that dimension (if MinWidth == 0, MinWidth will be
+    * set to the opening Width of the Window).
+    * You can change these settings later using SetWindowLimits().
+    * If you haven't asked for a SIZING Gadget, you don't have to
+    * initialize any of these variables.
+    */
+    WORD MinWidth, MinHeight;	    /* minimums */
+    UWORD MaxWidth, MaxHeight;	     /* maximums */
+
+    /* the type variable describes the Screen in which you want this Window to
+    * open.  The type value can either be CUSTOMSCREEN or one of the
+    * system standard Screen Types such as WBENCHSCREEN.  See the
+    * type definitions under the Screen structure.
+    */
+    UWORD Type;
+
+};
 
 
 #endif

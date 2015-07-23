@@ -154,6 +154,7 @@
     <ClCompile Include="unpacker.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\amiga_temp.h" />
     <ClInclude Include="includes\blitregs.h" />
     <ClInclude Include="includes\dphook.h" />
     <ClInclude Include="includes\dpiff.h" />
