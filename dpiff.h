@@ -21,9 +21,10 @@ extern IFFP IffErr();	/* returns an IFFP error code; see IFF.H */
 /* Range id */
 #define ID_CRNG		MakeID('C','R','N','G')
 
-typedef BOOL (*ResizeProc)();
+typedef BOOL( *ResizeProc )( );
 
-typedef struct {
+typedef struct
+{
     LONG flags;
     struct BitMap *bitmap;
     SHORT w;			/* pixel width of bitmap */
@@ -35,11 +36,11 @@ typedef struct {
     Point2D grab;
     Range *ranges;
     SHORT nRange;
-    } MaskBM;
-    
-extern BOOL PutMaskBM(LONG, MaskBM *, WORD *, BYTE *, LONG);
+} MaskBM;
+
+extern BOOL PutMaskBM( LONG, MaskBM *, WORD *, BYTE *, LONG );
 /*		     file, maskBM, colorMap, buffer, bufsize */
- 
-extern BOOL GetMaskBM(LONG, MaskBM *, WORD *, ResizeProc,  BYTE *,LONG );
+
+extern BOOL GetMaskBM( LONG, MaskBM *, WORD *, ResizeProc, BYTE *, LONG );
 /*     file  maskBM  colorMap   reSize()  buffer  bufsize	*/
 

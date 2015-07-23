@@ -37,11 +37,11 @@ typedef long longFrac;
 #define XORMODE 1	/* XOR source into dest 			*/
 #define ORMODE 	2	/* OR source into dest		 		*/
 #define XPMODE 	3	/* current transparent color doesnt paint, 
-			    other colors write		 		*/
+                other colors write		 		*/
 #define ANDMODE	4	/* AND source into dest		 		*/
 #define ERSMODE	5	/* ERASE: and complement of source into dest	*/
 #define COLMODE	6	/* use source as mask through which current 
-			    color is painted into dest 			*/
+                color is painted into dest 			*/
 
 
 #define BLACK	0
@@ -66,7 +66,7 @@ typedef long longFrac;
 
 #define colForY(y) 	colw = curpat[y&3] 
 
-
+
 
 /*--------------------------------------------------------------*/
 /*								*/
@@ -74,81 +74,88 @@ typedef long longFrac;
 /*								*/
 /*--------------------------------------------------------------*/
 
-typedef union {
-    struct { char lo,hi; } b;
+typedef union
+{
+    struct { char lo, hi; } b;
     int w;
-    } Wrdovl;
+} Wrdovl;
 
-typedef struct{ int x,y; } Point;
-	
-typedef struct{ int w,h; } Dims;
-	
-typedef struct{ int x,y,w,h; } Box;
-	
-typedef struct{
-	Word segment;	/* segment addr of bitmap		*/
-	Word *base;	/* addr of start of data 		*/
-	Word width;	/* width in words 			*/
-	Box box;	/* image bounds 			*/
-	Word *ytab; 	/* pointer to table  of y offsets 	*/
-	Byte xpcolor;	/* transparent	color			*/
-	Byte mode;	/* paint mode				*/
-	} Bitmap;
+typedef struct { int x, y; } Point;
+
+typedef struct { int w, h; } Dims;
+
+typedef struct { int x, y, w, h; } Box;
+
+typedef struct
+{
+    Word segment;	/* segment addr of bitmap		*/
+    Word *base;	/* addr of start of data 		*/
+    Word width;	/* width in words 			*/
+    Box box;	/* image bounds 			*/
+    Word *ytab; 	/* pointer to table  of y offsets 	*/
+    Byte xpcolor;	/* transparent	color			*/
+    Byte mode;	/* paint mode				*/
+} Bitmap;
 
 #define INITBM	{NIL,NIL,0,{0,0,0,0},NIL,0,XPMODE}
 
 /* General Displayable Object  DOB			*/
 
-typedef struct {
-    int (*display)();	/* pointer to display proc 	*/
-    int x,y;		/* present coords of upper left */
-    int xoffs,yoffs;	/* offset of grab point 	*/
+typedef struct
+{
+    int( *display )( );	/* pointer to display proc 	*/
+    int x, y;		/* present coords of upper left */
+    int xoffs, yoffs;	/* offset of grab point 	*/
     Boolean showing;	/* is it displayed?		*/
     Bitmap svbm;	/* save bitmap			*/
-    } DOB;
+} DOB;
 
 /* Bitmap Object: if mbm is defined (segment != NIL)  */
-typedef struct {
+typedef struct
+{
     DOB hdr;		/* header inherited from DOB	*/
     Bitmap sbm;		/* source bitmap 		*/
     Bitmap mbm;		/* mask bitmap(optional)	*/
-    } BMObj;
+} BMObj;
 
 #define INITDOB   {NIL,0,0,0,0,FALSE,INITBM}
 #define INITPSB   {INITBM,INITBM,INITBM,INITBM}
 #define INITBMOB  {INITDOB,INITBM,INITBM}
 
-typedef struct{
+typedef struct
+{
     int curcol;
     int curxpc;
     Box box;
     int curmode;
     Bitmap *curbm;
-    } GrState;
+} GrState;
 
 /* window: definitions */
-typedef struct {
+typedef struct
+{
     unsigned border : 1; /* draw border */
     unsigned always : 1; /* call even if mouse didnt move */
     unsigned hangOn : 1; /* keep control while button down */
-    } WFlags;
-    
-struct Winrec{
+} WFlags;
+
+struct Winrec
+{
     Word client;	/* client context */
     Box box;		/* rectangle on screen */
     WFlags flags;	/* booleans */
     Boolean border;	/* does it have a border */
-    int (*charProc)();  /* called with all typing      */
-    int (*mouseProc)();	/* called on all mouse actions */
-    int (*paintProc)();	/* called to repaint window */
+    int( *charProc )( );  /* called with all typing      */
+    int( *mouseProc )( );	/* called on all mouse actions */
+    int( *paintProc )( );	/* called to repaint window */
     struct Winrec *next;
-    };
+};
 
 typedef struct Winrec Window;
 
 typedef Byte MouseEvent;
 
-/* mouse events: you can choose to be called when the program loops 
+/* mouse events: you can choose to be called when the program loops
     even though the mouse didnt move */
 
 #define NONE	0	/* nothing happened (i dont call you) */    
@@ -161,27 +168,30 @@ typedef Byte MouseEvent;
 
 /* Magnified Bitmap window   (subclassed off of Window)		 */
 
-struct MagWinGr {
+struct MagWinGr
+{
     Bitmap *bbm;
     struct MagWinRec *first;
-    };
+};
 
-struct MagWinRec{
+struct MagWinRec
+{
     Window win;
     Point wb;			/* coords of window rel to bitmap */
     int	mag;			/* magnification */
     struct MagWinGr *group;	/* pointer to group sharing backing bitmap */
     struct MagWinRec *sib;	/* sister in group */
-    };
-    
+};
+
 typedef struct MagWinGr MWGroup;
 typedef struct MagWinRec MagWindow;
-        
-typedef struct {
+
+typedef struct
+{
     Bitmap *bm;
     Box box;
-    int xorg,yorg;
-    } GrCntxt;
+    int xorg, yorg;
+} GrCntxt;
 
 /* ----- Activities -------*/
 #define	nullAct		0
@@ -207,86 +217,95 @@ typedef struct {
 #define NPENS 	9
 #define USERPEN	-1
 
-
+
 /*--------------------------------------------------------------*/
 /*								*/
 /*		Menu Box 			 		*/
 /*								*/
 /*--------------------------------------------------------------*/
 
-struct MenuRec {
+struct MenuRec
+{
     Box		box;	/*window - relative */
     int		type;	/* what kind of item */
     struct MenuRec  *next;
-    };  
+};
 
 typedef struct MenuRec MenuItem, *MIPtr;
 
-typedef struct {
+typedef struct
+{
     Window	win;
     Boolean	showing; /* is it on the screen? */
     Boolean	isTemp;
     MenuItem	*curmi;
     MenuItem	*items;
     int		effNWIDE; /* set to 320 initially */
-    } MBox;
+} MBox;
 
 /*------ Passive Types----- */
 
 #define	LablTyp		0
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     char 	*name;
-    } Labl;
+} Labl;
 
 #define	ColBoxTyp	1	
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     Word	fillPat;
-    } ColBx;
-	    
+} ColBx;
+
 /* -------  Active Types----- */
 
 #define	ButnTyp		2
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     char 	*name;
     Boolean	islit;
-    int		(*proc)();
-    } Butn;
-	    
+    int( *proc )( );
+} Butn;
+
 #define	TBoxTyp		3
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     char 	*string;
     int		nmax;
-    int		(*proc)();
-    } TBox;
+    int( *proc )( );
+} TBox;
 
 #define MarTyp		4
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     char 	**names;
     Boolean	dolines;
     Boolean	vertical;
     int		spacing;	/* used only by horizontal */
-    int		(*proc)();
-    int		curitem,lit,nitems; /* used by menu processr */
-    } Mar;
-        	    
+    int( *proc )( );
+    int		curitem, lit, nitems; /* used by menu processr */
+} Mar;
+
 #define	ScBarTyp	5
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
-    int		(*proc)();
-    } ScBar;
+    int( *proc )( );
+} ScBar;
 
 #define	NBoxTyp		6
-typedef struct	{
+typedef struct
+{
     MenuItem	hdr;
     int 	pval;		/*  value to be displayed*/
     int		nmax;		/*  max num of chars */
-    int		(*proc)();
-    } NBox;
+    int( *proc )( );
+} NBox;
 
 #define MAXCHRS		9
 #define NEWITEM		10
@@ -318,7 +337,7 @@ typedef int CursID;
 
 /* input device vector*/
 
-extern int (*rdInDev)();
+extern int( *rdInDev )( );
 #define rdmouse(xaddr,yaddr) 	((*rdInDev)(xaddr,yaddr))
 
 /* Hardware Type*/

@@ -34,62 +34,62 @@ extern BoxBM temp2;
 prlf() { dprintf("\n"); }
 prBox(b) Box *b; {
     dprintf("  Box :(%ld, %ld, %ld, %ld)\n", b->x, b->y, b->w, b->h);
-    }
+}
 prBoxBM(bbm) BoxBM *bbm;
-    { dprintf("BoxBM:"); prBox(&bbm->box); prbm(bbm->bm);    }
+{ dprintf("BoxBM:"); prBox(&bbm->box); prbm(bbm->bm);    }
 
 XBltBitMap(sbm,sx,sy,dbm,dx,dy,w,h,mint,mask,tmp)
-    struct BitMap *sbm,*dbm; SHORT sx,sy,dx,dy,w,h;
-    UBYTE mint,mask, *tmp; {
-/*    if (dbgbmob) */
+struct BitMap *sbm,*dbm; SHORT sx,sy,dx,dy,w,h;
+UBYTE mint,mask, *tmp; {
+    /*    if (dbgbmob) */
     dprintf("BltBitMap, src xy = %ld,%ld, dst xy = %ld, %ld, w,h=%ld,%ld\n",sx,sy,dx,dy,w,h);
     BltBitMap(sbm,sx,sy,dbm,dx,dy,w,h,mint,mask,tmp);
-    }
+}
 
 #endif 
 
 /**
 dbgbm(bm) struct BitMap *bm; {
-    if (dbgbmob) 
-    BltBitMap(bm,0,0,canvas.bm,0,0,bm->BytesPerRow*8,bm->Rows,REPOP,0xff,NULL);
-    }
+if (dbgbmob)
+BltBitMap(bm,0,0,canvas.bm,0,0,bm->BytesPerRow*8,bm->Rows,REPOP,0xff,NULL);
+}
 **/
 
 /*--------------------------------------------------------------*/
 /* all the boxes are relative to the same coordinate system 	*/
-CopyBoxBM(src,dst,mb,clip,mint)  
-    BoxBM *src; /* source */
-    BoxBM *dst;	/* destination */
-    Box *mb;  	/* box to be moved */
-    Box *clip; 	/* clipping box */
-    SHORT mint;	/* minterm */
-    {
+CopyBoxBM( src, dst, mb, clip, mint )
+BoxBM *src; /* source */
+BoxBM *dst;	/* destination */
+Box *mb;  	/* box to be moved */
+Box *clip; 	/* clipping box */
+SHORT mint;	/* minterm */
+{
     Box cb;
     BOOL res;
-    if (clip) res = BoxAnd(&cb,mb,clip);
-    else {res = YES; cb = *mb; }
-    if (res) {  
-	WaitBlit();
-	BltBitMap(src->bm, cb.x - src->box.x, cb.y - src->box.y, dst->bm, 
-	  cb.x - dst->box.x, cb.y - dst->box.y, cb.w, cb.h, mint, 0xff, NULL);
-	WaitBlit();
-	}
+    if ( clip ) res = BoxAnd( &cb, mb, clip );
+    else { res = YES; cb = *mb; }
+    if ( res ) {
+        WaitBlit();
+        BltBitMap( src->bm, cb.x - src->box.x, cb.y - src->box.y, dst->bm,
+                   cb.x - dst->box.x, cb.y - dst->box.y, cb.w, cb.h, mint, 0xff, NULL );
+        WaitBlit();
     }
+}
 
 /*----------------------------------------------------------------------*/
 /* BoxNot creates an array of four boxes "n" which represent the	*/
 /*  complement of the input box "b":  n = NOT(b)			*/
 /*----------------------------------------------------------------------*/
 #define BIG 25000
-BoxNot(n, b) Box *n, *b; {	
+BoxNot( n, b ) Box *n, *b; {
     SHORT xm = b->x + b->w;
     SHORT ym = b->y + b->h;
     n->x = b->x;  n->y = -BIG;  n->w = BIG;        n->h = BIG + b->y;  n++;
     n->x = xm;    n->y = b->y;  n->w = BIG;        n->h = BIG;         n++;
     n->x = -BIG;  n->y = ym;    n->w = BIG + xm;   n->h = BIG;         n++;
     n->x = -BIG;  n->y = -BIG;  n->w = BIG + b->x; n->h = BIG + ym;
-    }
-    
+}
+
 /*----------- Synchronize with the vertical beam motion */
 
 #ifdef awawawa 
@@ -100,11 +100,11 @@ void WaitBeam(n) SHORT n; {
     if (curFormat == 2) return;
     tol = curFormat?100:50;
     for (;;) { 
-	vb = VBeamPos() - n;
-	if (vb<0) vb += 256;
-	if (( 0 <= vb) && ( vb < tol))  return; 
-	}
+        vb = VBeamPos() - n;
+        if (vb<0) vb += 256;
+        if (( 0 <= vb) && ( vb < tol))  return; 
     }
+}
 #endif
 
 extern PaintMode paintMode;
@@ -113,13 +113,13 @@ extern BOOL firstDown;
 extern SHORT lastSmX, lastSmY;
 
 /* make bm same size as pict bm of object, curdepth in depth */
-SaveSizeBM(bm,ob) struct BitMap *bm;  BMOB *ob; {
-    return(NewSizeBitMap(bm, curDepth, ob->pict.box.w, ob->pict.box.h));
-    }
+SaveSizeBM( bm, ob ) struct BitMap *bm;  BMOB *ob; {
+    return( NewSizeBitMap( bm, curDepth, ob->pict.box.w, ob->pict.box.h ) );
+}
 
-int BMBlitSize(bm) struct BitMap *bm; {
-    return((int) BlitSize(bm->BytesPerRow, bm->Rows));
-    }
+int BMBlitSize( bm ) struct BitMap *bm; {
+    return( (int) BlitSize( bm->BytesPerRow, bm->Rows ) );
+}
 
 
 /*----------------------------------------------------------------------*/
@@ -129,30 +129,30 @@ int BMBlitSize(bm) struct BitMap *bm; {
 /* First some utilities .... */
 
 /* maskblit the save.bm at the CURRENT position */
-MBSaveAtPict(ob,canv,clip,mask) 
-    BMOB *ob; BoxBM *canv; Box *clip; UBYTE *mask;  {		    
+MBSaveAtPict( ob, canv, clip, mask )
+BMOB *ob; BoxBM *canv; Box *clip; UBYTE *mask;  {
     Box b;
-    BoxAnd(&b,&ob->save.box,clip);
+    BoxAnd( &b, &ob->save.box, clip );
     b.x += ob->pict.box.x - ob->save.box.x;
     b.y += ob->pict.box.y - ob->save.box.y;
     MaskBlit( ob->save.bm, &ob->pict.box, mask, canv->bm,
-	    &canv->box, &b, clip, COOKIEOP, tmpRas.RasPtr, 0xff,0);
-    }
-    
-RelocBoxBM(fr,to) BoxBM *fr,*to; {
-    DupBitMap(fr->bm,to->bm);
-    BlankBitMap(fr->bm);
-    to->box = fr->box;
-    }
+              &canv->box, &b, clip, COOKIEOP, tmpRas.RasPtr, 0xff, 0 );
+}
 
-void DoSmear(ob,canv,clip)  BMOB *ob; BoxBM *canv; Box *clip;  {		    
-    if (SaveSizeBM(temp.bm, ob)) return;
+RelocBoxBM( fr, to ) BoxBM *fr, *to; {
+    DupBitMap( fr->bm, to->bm );
+    BlankBitMap( fr->bm );
+    to->box = fr->box;
+}
+
+void DoSmear( ob, canv, clip )  BMOB *ob; BoxBM *canv; Box *clip;  {
+    if ( SaveSizeBM( temp.bm, ob ) ) return;
     temp.box = ob->pict.box;
-    CopyBoxBM(canv, &temp, &temp.box, clip, REPOP);
-    if (!firstDown) MBSaveAtPict(ob,canv,clip,ob->mask);
+    CopyBoxBM( canv, &temp, &temp.box, clip, REPOP );
+    if ( !firstDown ) MBSaveAtPict( ob, canv, clip, ob->mask );
     else firstDown = NO;
-    RelocBoxBM(&temp,&ob->save); /* save = temp */
-    }
+    RelocBoxBM( &temp, &ob->save ); /* save = temp */
+}
 
 #ifdef DOADD
 void DoAdd(ob,canv,clip)  BMOB *ob; BoxBM *canv; Box *clip;  {		    
@@ -161,28 +161,28 @@ void DoAdd(ob,canv,clip)  BMOB *ob; BoxBM *canv; Box *clip;  {
     CopyBoxBM(canv, &temp, &temp.box, clip, REPOP);
     AddBM(ob->pict.bm, temp.bm, tmpRas.RasPtr);
     CopyBoxBM(&temp,camv, &temp.box,clip,REPOP);
-    }
+}
 #endif
-    
+
 
 #define USEMSK  0x100
 #define USEPCT  0x200
 #define SPECIAL 0x400
 
-USHORT paintProps[NPaintModes] = {
-    USEPCT| USEMSK| COOKIEOP,  	/*  Mask */
-	    USEMSK| COOKIEOP,	/*  Color  */
-    USEPCT| REPOP,		/*  Replace */
+USHORT paintProps[ NPaintModes ] = {
+    USEPCT | USEMSK | COOKIEOP,  	/*  Mask */
+    USEMSK | COOKIEOP,	/*  Color  */
+    USEPCT | REPOP,		/*  Replace */
     SPECIAL,   			/*  Smear */
     SPECIAL,			/*  Shade */
     SPECIAL,			/*  Blend */
-	    USEMSK| COOKIEOP,	/*  Cycle Paint*/
-    USEPCT| USEMSK| XORMASK	/*  Xor */
-    };
+    USEMSK | COOKIEOP,	/*  Cycle Paint*/
+    USEPCT | USEMSK | XORMASK	/*  Xor */
+};
 
 /* pens don't have Picture: just mask so they do the best they can
    in Mask and Replace modes */
-USHORT penModes[NPaintModes] = {
+USHORT penModes[ NPaintModes ] = {
     Color,  	/*  Mask */
     Color,	/* Color  */
     Color,	/*  Replace */
@@ -191,32 +191,32 @@ USHORT penModes[NPaintModes] = {
     Blend,	/*  Blend */
     Color,	/*  Cycle Paint*/
     Xor		/*  Xor */
-    };
+};
 
 #define ERASPROPS   USEMSK|COOKIEOP
 
-		
-    
+
+
 /*--------------------------------------------------------------*/
 /* Paint the object onto the canvas through the clip box 	*/
 /* using "paintMode", the current global painting mode      	*/
 /*--------------------------------------------------------------*/
-void PaintOb(ob, canv, clip)  BMOB *ob; BoxBM *canv; Box *clip;  {
+void PaintOb( ob, canv, clip )  BMOB *ob; BoxBM *canv; Box *clip;  {
     UBYTE *tmpMask = NULL;
-    SHORT pluse,pldef,props;
+    SHORT pluse, pldef, props;
     PaintMode pntMode;
     tmpMask = tmpRas.RasPtr;
     pntMode = paintMode;
-    if (curpen!=USERBRUSH) pntMode = penModes[pntMode];
-    if ((pntMode==Smear)||(pntMode==Blend)) { 
-	if (erasing||!Painting) pntMode = Color;
-	}
-    props = paintProps[pntMode]; 
+    if ( curpen != USERBRUSH ) pntMode = penModes[ pntMode ];
+    if ( ( pntMode == Smear ) || ( pntMode == Blend ) ) {
+        if ( erasing || !Painting ) pntMode = Color;
+    }
+    props = paintProps[ pntMode ];
     pluse = 0;
-    if (erasing) {
-	if (pntMode==Replace) { PFillBox(&ob->pict.box); return; }
-	  else if (pntMode!=Shade) 
-		{ props = ERASPROPS; pldef = curxpc; }
+    if ( erasing ) {
+        if ( pntMode == Replace ) { PFillBox( &ob->pict.box ); return; }
+        else if ( pntMode != Shade )                                                                                                                                                                                                        {
+ props = ERASPROPS; pldef = curxpc; }
 	}
     else if  (props&USEPCT) pluse = ob->planeUse; 
 	    else  { pldef = curRP->FgPen;   }

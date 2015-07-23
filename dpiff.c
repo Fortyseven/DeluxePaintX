@@ -19,7 +19,7 @@ static IFFP ifferror = 0;
 extern Box screenBox;
 
 #define CkErr(expression)  {if (ifferror == IFF_OKAY) ifferror = (expression);}
-    
+
 /*****************************************************************************/
 /* IffErr                                                                    */
 /*                                                                           */
@@ -27,26 +27,27 @@ extern Box screenBox;
 /*                                                                           */
 /*****************************************************************************/
 IFFP IffErr()
-   {
-   IFFP i;
-   i = ifferror;
-   ifferror = 0;
-   return(i);
-   }
+{
+    IFFP i;
+    i = ifferror;
+    ifferror = 0;
+    return( i );
+}
 
 /*------------ ILBM reader -----------------------------------------------*/
 /* DVCS' number of planes in a bitmap. Could use MaxAmDepth. */
 
 /* Here's our "client frame" for reading an IFF file, looking for ILBMs.
  * We use it to stack BMHD & CMAP properties. */
-typedef struct {
-   ClientFrame clientFrame;
-   UBYTE foundBMHD;
-   UBYTE nColorRegs;
-   BitMapHeader bmHdr;
-   Color4 colorMap[1<<MaxDepth];
-   /* [TBD] Place to store any other shared PROPs encountered in a LIST.*/
-   } ILBMFrame;
+typedef struct
+{
+    ClientFrame clientFrame;
+    UBYTE foundBMHD;
+    UBYTE nColorRegs;
+    BitMapHeader bmHdr;
+    Color4 colorMap[ 1 << MaxDepth ];
+    /* [TBD] Place to store any other shared PROPs encountered in a LIST.*/
+} ILBMFrame;
 
 
 /* GetPicture communicates with GetFoILBM via these.*/
@@ -66,7 +67,7 @@ prbmHdr(bmHdr)  BitMapHeader *bmHdr; {
     printf("bmHdr->compression %ld\n",bmHdr->compression);
     printf("bmHdr->pad1 %ld",bmHdr->pad1);
     printf("bmHdr->transparentColor %ld\n",bmHdr->transparentColor);
-    }
+}
 #endif
 
 /*----------------------------------------------------------------------*/
@@ -84,7 +85,7 @@ static MaskBM *gpMaskBM;
 static SHORT rngCnt;
 ResizeProc gpReSize;
 
-IFFP MBMGetFoILBM(parent)  GroupContext *parent; {
+IFFP MBMGetFoILBM( parent )  GroupContext *parent; {
     /*compilerBug register*/ IFFP iffp;
     GroupContext formContext;
     ILBMFrame ilbmFrame;
@@ -92,109 +93,109 @@ IFFP MBMGetFoILBM(parent)  GroupContext *parent; {
     BOOL resizeFail;
 
     /* Dive into any non-ILBM FORM looking for an ILBM.*/
-    if (parent->subtype != ID_ILBM) {
-	/* Open a non-ILBM FORM.*/
-	iffp = OpenRGroup(parent, &formContext);
-	CheckIFFP();
-	do {
-	    iffp = GetF1ChunkHdr(&formContext);
-	    } while (iffp >= IFF_OKAY);
-	if (iffp == END_MARK)
-	    iffp = IFF_OKAY;	/* then continue scanning the file */
-	CloseRGroup(&formContext);
-	return(iffp);
-	}
+    if ( parent->subtype != ID_ILBM ) {
+        /* Open a non-ILBM FORM.*/
+        iffp = OpenRGroup( parent, &formContext );
+        CheckIFFP();
+        do {
+            iffp = GetF1ChunkHdr( &formContext );
+        } while ( iffp >= IFF_OKAY );
+        if ( iffp == END_MARK )
+            iffp = IFF_OKAY;	/* then continue scanning the file */
+        CloseRGroup( &formContext );
+        return( iffp );
+    }
 
     /* Open an ILBM FORM.*/
-    iffp = OpenRGroup(parent, &formContext);
+    iffp = OpenRGroup( parent, &formContext );
     CheckIFFP();
 
     /* Place to store any ILBM properties that are found, starting from
      * any values found in ancestors.*/
-    ilbmFrame = *(ILBMFrame *)parent->clientFrame;
+    ilbmFrame = *(ILBMFrame *) parent->clientFrame;
 
-    do switch (iffp = GetFChunkHdr(&formContext)) {
-	case ID_BMHD: {
-	    ilbmFrame.foundBMHD = TRUE;
-            iffp = GetBMHD(&formContext, &ilbmFrame.bmHdr);
-	    break; }
-	case ID_CMAP: {
-	    ilbmFrame.nColorRegs = 1 << MaxDepth;  /* we have room for this many */
-	    iffp = GetCMAP(
-		&formContext, (WORD *)&ilbmFrame.colorMap, &ilbmFrame.nColorRegs);
-	    gpMaskBM->flags |= MBM_HAS_CMAP;
-	    break; 
-	    }
-	case ID_GRAB: {
-	    iffp = IFFReadBytes(&formContext, (BYTE *)&gpMaskBM->grab, 
-		    sizeof(Point2D));
-	    gpMaskBM->flags |= MBM_HAS_GRAB;
-	    break; }
+    do switch ( iffp = GetFChunkHdr( &formContext ) ) {
+        case ID_BMHD: {
+                          ilbmFrame.foundBMHD = TRUE;
+                          iffp = GetBMHD( &formContext, &ilbmFrame.bmHdr );
+                          break; }
+        case ID_CMAP: {
+                          ilbmFrame.nColorRegs = 1 << MaxDepth;  /* we have room for this many */
+                          iffp = GetCMAP(
+                              &formContext, (WORD *) &ilbmFrame.colorMap, &ilbmFrame.nColorRegs );
+                          gpMaskBM->flags |= MBM_HAS_CMAP;
+                          break;
+        }
+        case ID_GRAB: {
+                          iffp = IFFReadBytes( &formContext, (BYTE *) &gpMaskBM->grab,
+                                               sizeof( Point2D ) );
+                          gpMaskBM->flags |= MBM_HAS_GRAB;
+                          break; }
 
-    	case ID_CRNG:
-	    if (( gpMaskBM->ranges != NULL) && (rngCnt<gpMaskBM->nRange)) 
-		iffp = IFFReadBytes(&formContext, 
-		    (BYTE *)&gpMaskBM->ranges[rngCnt++], sizeof(Range));
-	    break; 
-	
-	case ID_BODY: {
-	    if (!ilbmFrame.foundBMHD)  return(BAD_FORM);
+        case ID_CRNG:
+            if ( ( gpMaskBM->ranges != NULL ) && ( rngCnt < gpMaskBM->nRange ) )
+                iffp = IFFReadBytes( &formContext,
+                (BYTE *) &gpMaskBM->ranges[ rngCnt++ ], sizeof( Range ) );
+            break;
 
-	    gpMaskBM->pos.x = ilbmFrame.bmHdr.x;
-	    gpMaskBM->pos.y = ilbmFrame.bmHdr.y;
-	    gpMaskBM->xAspect = ilbmFrame.bmHdr.xAspect;
-	    gpMaskBM->yAspect = ilbmFrame.bmHdr.yAspect;
-	    gpMaskBM->masking = ilbmFrame.bmHdr.masking;
-	    gpMaskBM->xpcolor = ilbmFrame.bmHdr.transparentColor;
+        case ID_BODY: {
+                          if ( !ilbmFrame.foundBMHD )  return( BAD_FORM );
 
-	    if (gpMaskBM->grab.x > ilbmFrame.bmHdr.w)
-		gpMaskBM->grab.x = ilbmFrame.bmHdr.w;
-	    if (gpMaskBM->grab.y > ilbmFrame.bmHdr.h)
-		gpMaskBM->grab.y = ilbmFrame.bmHdr.h;
+                          gpMaskBM->pos.x = ilbmFrame.bmHdr.x;
+                          gpMaskBM->pos.y = ilbmFrame.bmHdr.y;
+                          gpMaskBM->xAspect = ilbmFrame.bmHdr.xAspect;
+                          gpMaskBM->yAspect = ilbmFrame.bmHdr.yAspect;
+                          gpMaskBM->masking = ilbmFrame.bmHdr.masking;
+                          gpMaskBM->xpcolor = ilbmFrame.bmHdr.transparentColor;
 
-         /*  Compare bmHdr dimensions with gpBitmap dimensions! */
-	    if( (RowBytes(ilbmFrame.bmHdr.w) != gpBitmap->BytesPerRow)||
-	    (ilbmFrame.bmHdr.h != gpBitmap->Rows) ||
-	    (ilbmFrame.bmHdr.nPlanes != gpBitmap->Depth) ) 		{
-		/* didn't fit: must resize the destination */
-		resizeFail = (*gpReSize)(gpMaskBM,&ilbmFrame.bmHdr); 
-		if (resizeFail ) return(BAD_FIT);
-		}
-	    
-         iffp = GetBODY(
-	    &formContext, gpMaskBM->bitmap, gpMaskBM->mask, 
-	    &ilbmFrame.bmHdr, gpBuffer, gpBufsize);
-         if (iffp == IFF_OKAY) iffp = IFF_DONE;	/* Eureka */
-         break; }
-      case END_MARK: { iffp = BAD_FORM; break; } /* No BODY chunk! */
-      } while (iffp >= IFF_OKAY);  /* loop if valid ID of ignored chunk or a
-			  * subroutine returned IFF_OKAY, i.e., no errors.*/
+                          if ( gpMaskBM->grab.x > ilbmFrame.bmHdr.w )
+                              gpMaskBM->grab.x = ilbmFrame.bmHdr.w;
+                          if ( gpMaskBM->grab.y > ilbmFrame.bmHdr.h )
+                              gpMaskBM->grab.y = ilbmFrame.bmHdr.h;
 
-   if (iffp != IFF_DONE)  return(iffp);
-   CloseRGroup(&formContext);
+                          /*  Compare bmHdr dimensions with gpBitmap dimensions! */
+                          if ( ( RowBytes( ilbmFrame.bmHdr.w ) != gpBitmap->BytesPerRow ) ||
+                               ( ilbmFrame.bmHdr.h != gpBitmap->Rows ) ||
+                               ( ilbmFrame.bmHdr.nPlanes != gpBitmap->Depth ) ) {
+                              /* didn't fit: must resize the destination */
+                              resizeFail = ( *gpReSize )( gpMaskBM, &ilbmFrame.bmHdr );
+                              if ( resizeFail ) return( BAD_FIT );
+                          }
 
-   /* It's a good ILBM, return the properties to the client.*/
+                          iffp = GetBODY(
+                              &formContext, gpMaskBM->bitmap, gpMaskBM->mask,
+                              &ilbmFrame.bmHdr, gpBuffer, gpBufsize );
+                          if ( iffp == IFF_OKAY ) iffp = IFF_DONE;	/* Eureka */
+                          break; }
+        case END_MARK: { iffp = BAD_FORM; break; } /* No BODY chunk! */
+    } while ( iffp >= IFF_OKAY );  /* loop if valid ID of ignored chunk or a
+            * subroutine returned IFF_OKAY, i.e., no errors.*/
 
-   /* Copy CMAP into client's storage.*/
-   /* nColorRegs is 0 if no CMAP;  no data will be copied to gpColorMap.
-    * That's ok; client is left with whatever colors she had before.*/
-    if (gpColorMap!=NULL)   for (i = 0;  i < ilbmFrame.nColorRegs;  i++)
-      gpColorMap[i] = ilbmFrame.colorMap[i];
-   return(iffp);
-   }
+    if ( iffp != IFF_DONE )  return( iffp );
+    CloseRGroup( &formContext );
+
+    /* It's a good ILBM, return the properties to the client.*/
+
+    /* Copy CMAP into client's storage.*/
+    /* nColorRegs is 0 if no CMAP;  no data will be copied to gpColorMap.
+     * That's ok; client is left with whatever colors she had before.*/
+    if ( gpColorMap != NULL )   for ( i = 0; i < ilbmFrame.nColorRegs; i++ )
+        gpColorMap[ i ] = ilbmFrame.colorMap[ i ];
+    return( iffp );
+}
 
 /*****************************************************************************/
 /* MBMGetLiILBM()                                                            */
 /* Used by GetMaskBM to handle every LIST in an IFF file.                    */
 /*                                                                           */
 /*****************************************************************************/
-IFFP MBMGetLiILBM(parent)  GroupContext *parent; {
+IFFP MBMGetLiILBM( parent )  GroupContext *parent; {
     ILBMFrame newFrame;	/* allocate a new Frame */
 
-    newFrame = *(ILBMFrame *)parent->clientFrame;  /* copy parent frame */
+    newFrame = *(ILBMFrame *) parent->clientFrame;  /* copy parent frame */
 
-    return( ReadIList(parent, (ClientFrame *)&newFrame) );
-    }
+    return( ReadIList( parent, (ClientFrame *) &newFrame ) );
+}
 
 /*****************************************************************************/
 /* MBMGetPrILBM()                                                            */
@@ -202,39 +203,39 @@ IFFP MBMGetLiILBM(parent)  GroupContext *parent; {
 /* Reads PROP ILBMs and skips all others.                                    */
 /*                                                                           */
 /*****************************************************************************/
-IFFP MBMGetPrILBM(parent)  GroupContext *parent; {
-   /*compilerBug register*/ IFFP iffp;
-   GroupContext propContext;
-   ILBMFrame *ilbmFrame = (ILBMFrame *)parent->clientFrame;
+IFFP MBMGetPrILBM( parent )  GroupContext *parent; {
+    /*compilerBug register*/ IFFP iffp;
+    GroupContext propContext;
+    ILBMFrame *ilbmFrame = (ILBMFrame *) parent->clientFrame;
 
-   iffp = OpenRGroup(parent, &propContext);
-   CheckIFFP();
+    iffp = OpenRGroup( parent, &propContext );
+    CheckIFFP();
 
-   switch (parent->subtype)  {
+    switch ( parent->subtype ) {
 
-      case ID_ILBM: {
-         do switch (iffp = GetPChunkHdr(&propContext)) {
-            case ID_BMHD: {
-              ilbmFrame->foundBMHD = TRUE;
-              iffp = GetBMHD(&propContext, &ilbmFrame->bmHdr);
-              break; }
-            case ID_CMAP: {
-              ilbmFrame->nColorRegs = 1 << MaxDepth; /* room for this many */
-              iffp = GetCMAP(&propContext, (WORD *)&ilbmFrame->colorMap,
-			     &ilbmFrame->nColorRegs);
-	      gpMaskBM->flags |= MBM_HAS_CMAP;
-              break; }
-            } while (iffp >= IFF_OKAY);  /* loop if valid ID of ignored chunk
-                     * or a subroutine returned IFF_OKAY, i.e., no errors.*/
-         break;
-         }
+        case ID_ILBM: {
+                          do switch ( iffp = GetPChunkHdr( &propContext ) ) {
+                              case ID_BMHD: {
+                                                ilbmFrame->foundBMHD = TRUE;
+                                                iffp = GetBMHD( &propContext, &ilbmFrame->bmHdr );
+                                                break; }
+                              case ID_CMAP: {
+                                                ilbmFrame->nColorRegs = 1 << MaxDepth; /* room for this many */
+                                                iffp = GetCMAP( &propContext, (WORD *) &ilbmFrame->colorMap,
+                                                                &ilbmFrame->nColorRegs );
+                                                gpMaskBM->flags |= MBM_HAS_CMAP;
+                                                break; }
+                          } while ( iffp >= IFF_OKAY );  /* loop if valid ID of ignored chunk
+                                   * or a subroutine returned IFF_OKAY, i.e., no errors.*/
+                          break;
+        }
 
-      default: iffp = IFF_OKAY;        /* just continue scanning the file */
-      }
+        default: iffp = IFF_OKAY;        /* just continue scanning the file */
+    }
 
-   CloseRGroup(&propContext);
-   return(iffp == END_MARK ? IFF_OKAY : iffp);
-   }
+    CloseRGroup( &propContext );
+    return( iffp == END_MARK ? IFF_OKAY : iffp );
+}
 
 /*****************************************************************************/
 /* GetMaskBM()                                                              */
@@ -242,17 +243,17 @@ IFFP MBMGetPrILBM(parent)  GroupContext *parent; {
 /* Get a picture from an IFF file                                            */
 /*                                                                           */
 /*****************************************************************************/
-BOOL GetMaskBM(file, maskBM, colorMap, reSize, buffer, bufsize)
-      LONG file;  MaskBM *maskBM;  WORD *colorMap;
-	ResizeProc reSize; BYTE *buffer;  LONG bufsize;
-    {
+BOOL GetMaskBM( file, maskBM, colorMap, reSize, buffer, bufsize )
+LONG file;  MaskBM *maskBM;  WORD *colorMap;
+ResizeProc reSize; BYTE *buffer;  LONG bufsize;
+{
     ILBMFrame iFrame;
     iFrame.clientFrame.getList = &MBMGetLiILBM;
     iFrame.clientFrame.getProp = &MBMGetPrILBM;
     iFrame.clientFrame.getForm = &MBMGetFoILBM;
     iFrame.foundBMHD = FALSE;
     iFrame.nColorRegs = 0;
-    
+
     gpReSize = reSize;
     gpMaskBM = maskBM;
     gpBitmap = maskBM->bitmap;
@@ -263,9 +264,9 @@ BOOL GetMaskBM(file, maskBM, colorMap, reSize, buffer, bufsize)
     picNotFit = FALSE;
     maskBM->grab.x = maskBM->grab.y = 0;
 
-    ifferror = ReadIFF(file, (ClientFrame *)&iFrame);
-    return( (BOOL)(ifferror != IFF_DONE) );
-    }    
+    ifferror = ReadIFF( file, (ClientFrame *) &iFrame );
+    return( (BOOL) ( ifferror != IFF_DONE ) );
+}
 
 /*****************************************************************************/
 /* PutMaskBM()                                                               */
@@ -278,65 +279,65 @@ BOOL GetMaskBM(file, maskBM, colorMap, reSize, buffer, bufsize)
 /*                                                                           */
 /*****************************************************************************/
 BOOL dorng = YES;
-    
-BOOL PutMaskBM(file, maskBM, colorMap, buffer, bufsize)
-      LONG file; MaskBM *maskBM;  WORD *colorMap;
-      BYTE *buffer;  LONG bufsize;
 
-    {
+BOOL PutMaskBM( file, maskBM, colorMap, buffer, bufsize )
+LONG file; MaskBM *maskBM;  WORD *colorMap;
+BYTE *buffer;  LONG bufsize;
+
+{
     BitMapHeader bmHdr;
     GroupContext fileContext, formContext;
     IFFP tmpifferror;
     int i;
-	    
-    ifferror = InitBMHdr(&bmHdr,
-	maskBM->bitmap, 
-	(int)maskBM->masking, 
-	(maskBM->w <= 64)? (int)cmpNone : (int)cmpByteRun1, 
-	(int)maskBM->xpcolor,
-	(int)screenBox.w, 
-	(int)screenBox.h );
-	
-    bmHdr.x = maskBM->pos.x;   
+
+    ifferror = InitBMHdr( &bmHdr,
+                          maskBM->bitmap,
+                          (int) maskBM->masking,
+                          ( maskBM->w <= 64 ) ? (int) cmpNone : (int) cmpByteRun1,
+                          (int) maskBM->xpcolor,
+                          (int) screenBox.w,
+                          (int) screenBox.h );
+
+    bmHdr.x = maskBM->pos.x;
     bmHdr.y = maskBM->pos.y;
     bmHdr.w = maskBM->w;
 
 #define BODY_BUFSIZE 512
 
-    if (bufsize > 2*BODY_BUFSIZE) {
-	GWriteDeclare(file, buffer+BODY_BUFSIZE, bufsize-BODY_BUFSIZE);
-	bufsize = BODY_BUFSIZE;
-	}
-    
-    CkErr(OpenWIFF(file, &fileContext, szNotYetKnown) );
-    CkErr(StartWGroup(&fileContext, FORM, szNotYetKnown, ID_ILBM, &formContext) );
+    if ( bufsize > 2 * BODY_BUFSIZE ) {
+        GWriteDeclare( file, buffer + BODY_BUFSIZE, bufsize - BODY_BUFSIZE );
+        bufsize = BODY_BUFSIZE;
+    }
 
-    CkErr(PutCk(&formContext, ID_BMHD, sizeof(BitMapHeader), (BYTE *)&bmHdr));
+    CkErr( OpenWIFF( file, &fileContext, szNotYetKnown ) );
+    CkErr( StartWGroup( &fileContext, FORM, szNotYetKnown, ID_ILBM, &formContext ) );
 
-    if (colorMap!=NULL)
-	CkErr( PutCMAP(&formContext, colorMap, (UBYTE)maskBM->bitmap->Depth) );
-    if (maskBM->flags&MBM_HAS_GRAB) {
-	tmpifferror = PutCk(&formContext, ID_GRAB, sizeof(Point2D), 
-	    (BYTE *)&maskBM->grab); 
-	CkErr(tmpifferror); 
-	}
-    if (maskBM->flags&MBM_HAS_RANGES) {
-	for (i=0; i<maskBM->nRange; i++) {
-	    tmpifferror = PutCk(&formContext, ID_CRNG, sizeof(Range),
-		(BYTE *)&maskBM->ranges[i]);
-	    CkErr(tmpifferror); 
-	    }
-	}
-    tmpifferror =  PutBODY(&formContext, maskBM->bitmap, 
-	(BYTE *)((maskBM->masking == mskHasMask)? maskBM->mask: NULL),
-	&bmHdr, buffer, bufsize);
-    CkErr(tmpifferror); 
-    
-    CkErr( EndWGroup(&formContext) );
-    CkErr( CloseWGroup(&fileContext) );
-    GWriteDeclare(NULL, NULL, 0);
-    return( (BOOL)(ifferror != IFF_OKAY) );
-    }    
+    CkErr( PutCk( &formContext, ID_BMHD, sizeof( BitMapHeader ), (BYTE *) &bmHdr ) );
+
+    if ( colorMap != NULL )
+        CkErr( PutCMAP( &formContext, colorMap, (UBYTE) maskBM->bitmap->Depth ) );
+    if ( maskBM->flags&MBM_HAS_GRAB ) {
+        tmpifferror = PutCk( &formContext, ID_GRAB, sizeof( Point2D ),
+                             (BYTE *) &maskBM->grab );
+        CkErr( tmpifferror );
+    }
+    if ( maskBM->flags&MBM_HAS_RANGES ) {
+        for ( i = 0; i < maskBM->nRange; i++ ) {
+            tmpifferror = PutCk( &formContext, ID_CRNG, sizeof( Range ),
+                                 (BYTE *) &maskBM->ranges[ i ] );
+            CkErr( tmpifferror );
+        }
+    }
+    tmpifferror = PutBODY( &formContext, maskBM->bitmap,
+                           (BYTE *) ( ( maskBM->masking == mskHasMask ) ? maskBM->mask : NULL ),
+                           &bmHdr, buffer, bufsize );
+    CkErr( tmpifferror );
+
+    CkErr( EndWGroup( &formContext ) );
+    CkErr( CloseWGroup( &fileContext ) );
+    GWriteDeclare( NULL, NULL, 0 );
+    return( (BOOL) ( ifferror != IFF_OKAY ) );
+}
 
 
 

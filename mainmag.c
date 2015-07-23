@@ -8,267 +8,279 @@
 
 extern PointRec pnts; /* contains mx,my,sx,sy, etc */
 
-extern void (*thisMode)(), (*nop)(), (*killMode)();
+extern void( *thisMode )( ), ( *nop )( ), ( *killMode )( );
 extern struct Window *mainW;
-extern Box bigBox,screenBox;
-extern struct RastPort tempRP, *mainRP, tempRP, *curRP,screenRP;
+extern Box bigBox, screenBox;
+extern struct RastPort tempRP, *mainRP, tempRP, *curRP, screenRP;
 extern struct BitMap hidbm;
 extern Pane mainP;
-extern SHORT xorg,yorg,curMBarH,curxpc;
+extern SHORT xorg, yorg, curMBarH, curxpc;
 extern void mainCproc(), mainMproc();
 extern Box mainBox;
 extern SHORT xShft;
 extern SHORT checkpat[];
 extern struct Screen *screen;
 extern BOOL wasCtrl;
-extern BOOL Painting;    
+extern BOOL Painting;
 extern PaintMode paintMode;
-    
+
 BOOL isUndoOn = NO;
 UndoOn() { isUndoOn = YES; }
 UndoOff() { isUndoOn = NO; }
 
-MagContext magCntxt = {0};
-Pane magP = {0};
+MagContext magCntxt = { 0 };
+Pane magP = { 0 };
 BOOL magOn = NO;
 BOOL updatePending; /* have changed the screen but not copied to hidbm yet */
-Box chgB = {0};
-Box tmpChgBox = {0};
+Box chgB = { 0 };
+Box tmpChgBox = { 0 };
 
 SHORT didClearCol;
 
 /* clips a change box against the non-magnified window */
 /* this is done in backing bitmap coords */
-ClipChgBox(clip,chgbx) {
-    Box b; 
+ClipChgBox( clip, chgbx )
+{
+    Box b;
     b.x = magCntxt.srcPos.x; b.y = magCntxt.srcPos.y;
     b.w = magCntxt.srcBox->w; b.h = magCntxt.srcBox->h;
-    return(BoxAnd(clip,chgbx,&b));
-    }
+    return( BoxAnd( clip, chgbx, &b ) );
+}
 
 /* records changes so UndoSave knows how big a rectangle to save */
 
-void RecChange(b) Box *b; {
-    EncloseBox(Painting ? & chgB: &tmpChgBox,b);
+void RecChange( b ) Box *b; {
+    EncloseBox( Painting ? &chgB : &tmpChgBox, b );
     updatePending = YES;
-    }
+}
 
-void RecTempChg(b) Box *b; { EncloseBox(&tmpChgBox,b);  }
+void RecTempChg( b ) Box *b; { EncloseBox( &tmpChgBox, b );  }
 
-CopyBack(b,op) Box *b; SHORT op; {
+CopyBack( b, op ) Box *b; SHORT op; {
     tempRP.BitMap = &hidbm;
-    ClipBlit(mainRP, b->x +xorg, b->y + yorg,
-	&tempRP, b->x, b->y, b->w, b->h, op);
-    } 
+    ClipBlit( mainRP, b->x + xorg, b->y + yorg,
+              &tempRP, b->x, b->y, b->w, b->h, op );
+}
 
-CopyFwd(b,op) Box *b; SHORT op; {
+CopyFwd( b, op ) Box *b; SHORT op; {
     tempRP.BitMap = &hidbm;
     ClipBlit( &tempRP, b->x, b->y,
-		mainRP,b->x +xorg, b->y + yorg, b->w, b->h, op); 
-    } 
+              mainRP, b->x + xorg, b->y + yorg, b->w, b->h, op );
+}
 
 /* make previous change permanent */
 SHORT didType = DIDNothing;
-    
+
 #ifdef hobaaaho
 UndoSave() { 
     Box cb;
     if (didClear) {
-	tempRP.BitMap = &hidbm; SetRast(&tempRP,didClearCol);
-	didClear = NO;
-	}
+        tempRP.BitMap = &hidbm; SetRast(&tempRP,didClearCol);
+        didClear = NO;
+    }
     else if (didMerge)  MrgSpareUpdt();
     if (ClipChgBox(&cb,&chgB)) CopyBack(&cb,REPOP); chgB.w = 0; 
-    }
+}
 #endif
 
 /* this should be called "MakeChangePermanent" */
 /* it copies changed area from the screen to the hidbm */
-UndoSave() { 
+UndoSave()
+{
     Box cb;
     ClearFB();
-    switch(didType) {
-	case DIDClear:
-	    tempRP.BitMap = &hidbm; SetRast(&tempRP,didClearCol);
-	    break;
-	case DIDMerge:   MrgSpareUpdt(); break;
-	}
-    if (ClipChgBox(&cb,&chgB)) CopyBack(&cb,REPOP); chgB.w = 0; 
+    switch ( didType ) {
+        case DIDClear:
+            tempRP.BitMap = &hidbm; SetRast( &tempRP, didClearCol );
+            break;
+        case DIDMerge:   MrgSpareUpdt(); break;
+    }
+    if ( ClipChgBox( &cb, &chgB ) ) CopyBack( &cb, REPOP ); chgB.w = 0;
     didType = DIDNothing;
     updatePending = NO;
-    }
+}
 
 /* swap hidden bitmap and screen in chgB */
-SwapHidScr() {
+SwapHidScr()
+{
     Box cb;
-    if (ClipChgBox(&cb,&chgB)) {
-	CopyFwd(&cb,XOROP); 
-	CopyBack(&cb,XOROP); 
-	CopyFwd(&cb,XOROP);
-	MagUpdate(&chgB);
-	}
+    if ( ClipChgBox( &cb, &chgB ) ) {
+        CopyFwd( &cb, XOROP );
+        CopyBack( &cb, XOROP );
+        CopyFwd( &cb, XOROP );
+        MagUpdate( &chgB );
     }
+}
 
-Undo() { 
-    switch(didType) {
-	case DIDClear: case DIDMerge:  UpdtDisplay(); didType = DIDNothing; break;
-	case DIDHPoly: SwapHidScr();  UndoHPoly(); didType = DIDNothing; break;
-	case DIDNothing: SwapHidScr();   break;
-	}
+Undo()
+{
+    switch ( didType ) {
+        case DIDClear: case DIDMerge:  UpdtDisplay(); didType = DIDNothing; break;
+        case DIDHPoly: SwapHidScr();  UndoHPoly(); didType = DIDNothing; break;
+        case DIDNothing: SwapHidScr();   break;
     }
+}
 
 /* this is called when operations are aborted in midstream */
 UnDisplay() { UpdtDisplay(); UndoSave(); }
 
-EraseBox(b) Box *b; {
+EraseBox( b ) Box *b; {
     Box clb;
-    if (ClipChgBox(&clb,b)) { CopyFwd(&clb,REPOP); MagUpdate(&clb);}
-    }
-    
+    if ( ClipChgBox( &clb, b ) ) { CopyFwd( &clb, REPOP ); MagUpdate( &clb ); }
+}
+
 /* this erases feedback from the screen */
-EraseTempChg() {
-    if (wasCtrl) { EncloseBox(&chgB, &tmpChgBox);
-	CycPaint();	/* A cheap effect... */    
-	}
-    else EraseBox(&tmpChgBox); 
-    tmpChgBox.w = 0;
+EraseTempChg()
+{
+    if ( wasCtrl ) {
+        EncloseBox( &chgB, &tmpChgBox );
+        CycPaint();	/* A cheap effect... */
     }
+    else EraseBox( &tmpChgBox );
+    tmpChgBox.w = 0;
+}
 
 /**-------------------------- **/
 
 #define BIG 1000;
 
 
-void magPaint() {
-    Box sbx; 
-    if (magOn) {
-	sbx.x = magCntxt.magPos.x;
-	sbx.y = magCntxt.magPos.y;
-	sbx.w = sbx.h = BIG;
-	MagBits(&hidbm, &sbx, mainRP->BitMap,magP.box.x, magP.box.y,
-	    magCntxt.magN, magCntxt.magN, &magP.box);
-	}
+void magPaint()
+{
+    Box sbx;
+    if ( magOn ) {
+        sbx.x = magCntxt.magPos.x;
+        sbx.y = magCntxt.magPos.y;
+        sbx.w = sbx.h = BIG;
+        MagBits( &hidbm, &sbx, mainRP->BitMap, magP.box.x, magP.box.y,
+                 magCntxt.magN, magCntxt.magN, &magP.box );
     }
+}
 
-mClearToBg()  {
+mClearToBg()
+{
     UndoSave();
     TempErase();
-    PFillBox(&screenBox);
+    PFillBox( &screenBox );
     ClearErase();
     didType = DIDClear;
     didClearCol = curxpc;
-    MagUpdate(&screenBox);
-    }
+    MagUpdate( &screenBox );
+}
 
 #define DivWidth 6
-PaintDivider() {
+PaintDivider()
+{
     Box dbox;
-    if (magOn) {
-	dbox.x = mainBox.w/3;
-	dbox.y = mainBox.y;
-	dbox.w = DivWidth;
-	dbox.h = mainBox.h;
-	
-	PushGrDest(&screenRP,&screenBox);
-	PPatternBox(&dbox, checkpat, 1, 0, 0);
-	PopGrDest();
-	}
+    if ( magOn ) {
+        dbox.x = mainBox.w / 3;
+        dbox.y = mainBox.y;
+        dbox.w = DivWidth;
+        dbox.h = mainBox.h;
+
+        PushGrDest( &screenRP, &screenBox );
+        PPatternBox( &dbox, checkpat, 1, 0, 0 );
+        PopGrDest();
     }
+}
 
 
-void magRefresh() {  magPaint();  PaintDivider();  }
+void magRefresh() { magPaint();  PaintDivider(); }
 
-void mainRefresh() {
+void mainRefresh()
+{
     tempRP.BitMap = &hidbm;
-    ClipBlit(&tempRP,magCntxt.srcPos.x,magCntxt.srcPos.y,
-	mainRP, mainP.box.x, mainP.box.y, mainP.box.w, mainP.box.h, REPOP);
-    }
+    ClipBlit( &tempRP, magCntxt.srcPos.x, magCntxt.srcPos.y,
+              mainRP, mainP.box.x, mainP.box.y, mainP.box.w, mainP.box.h, REPOP );
+}
 
-UpdtDisplay() {ClearFB(); mainRefresh(); magPaint(); }
+UpdtDisplay() { ClearFB(); mainRefresh(); magPaint(); }
 
 
 #ifdef THEIRWAY /*---------------------------------*/
 MoveWinTo(win,x,y) struct Window *win; int x,y; {
     MoveWindow(win, x - win->LeftEdge, y - win->TopEdge);
-    }
+}
 
 SizeWinTo(win,w,h) struct Window *win; int w,h; {
     SizeWindow(win, w - win->Width, h - win->Height);
-    }
-    
+}
+
 SizeAndMove(win,b) struct Window *win; Box *b; {
     if (win->Height != b->h) {
-	if (b->h > win->Height) { /* getting higher: move first */
-	    MoveWinTo(win, win->LeftEdge, b->y);
-	    SizeWinTo(win, win->Height, b->h);
-	    }
-	else {
-	    SizeWinTo(win, win->Height, b->h);
-	    MoveWinTo(win, win->LeftEdge, b->y);
-	    }
-	}
-    if (win->Width != b->w) 
-	{
-	if (b->w > win->Width) { /* getting wider:move first */
-	    MoveWinTo(win, b->x, win->TopEdge);
-	    SizeWinTo(win, b->w, win->Height);
-	    }
-	else {
-	    SizeWinTo(win, b->w, win->Height);
-	    MoveWinTo(win, b->x, win->TopEdge);
-	    }
-	}
+        if (b->h > win->Height) { /* getting higher: move first */
+            MoveWinTo(win, win->LeftEdge, b->y);
+            SizeWinTo(win, win->Height, b->h);
+        }
+        else {
+            SizeWinTo(win, win->Height, b->h);
+            MoveWinTo(win, win->LeftEdge, b->y);
+        }
     }
+    if (win->Width != b->w) 
+    {
+        if (b->w > win->Width) { /* getting wider:move first */
+            MoveWinTo(win, b->x, win->TopEdge);
+            SizeWinTo(win, b->w, win->Height);
+        }
+        else {
+            SizeWinTo(win, b->w, win->Height);
+            MoveWinTo(win, b->x, win->TopEdge);
+        }
+    }
+}
 
 #endif /* ------------------------------------------ */
 
-ResizeWins() {
+ResizeWins()
+{
     SHORT magx;
     Box mbox;
     mbox = mainBox;
-    mbox.w = (magOn)? mainBox.w/3: mainBox.w; 
+    mbox.w = ( magOn ) ? mainBox.w / 3 : mainBox.w;
 
 #ifdef THEIRWAY
     SizeAndMove(mainW,&mbox);
     KPrintF(" After SizeAndMOve mainW = %ld, %ld, %ld, %ld\n",
-	    mainW->LeftEdge,mainW->TopEdge,mainW->Width, mainW->Height);
+             mainW->LeftEdge,mainW->TopEdge,mainW->Width, mainW->Height);
 #endif
 
-    PaneSize(&mainP, mainBox.x, mainBox.y, mbox.w, mainBox.h);
+    PaneSize( &mainP, mainBox.x, mainBox.y, mbox.w, mainBox.h );
     magx = mbox.w + DivWidth;
-    PaneSize(&magP, magx, mainBox.y, mainBox.w - magx, mainBox.h);
-    }
-	
-MagCnst(b,p) Box *b; Point *p; {
+    PaneSize( &magP, magx, mainBox.y, mainBox.w - magx, mainBox.h );
+}
+
+MagCnst( b, p ) Box *b; Point *p; {
     Box c;
     c.x = p->x;    c.y = p->y;
     c.w = b->w;    c.h = b->h;
-    BoxBeInside(&c,&screenBox);
+    BoxBeInside( &c, &screenBox );
     p->x = c.x;    p->y = c.y;
     b->w = c.w;    b->h = c.h;
-    }
-    
+}
+
 /* make sure that the magnified portion of the bitmap is visible in
    the main window */
 
-BOOL FixMag() {
+BOOL FixMag()
+{
     SHORT nout;
     Box mf;
     BOOL srcChg = NO;
     /* first make sure mag and src  views are inside the hidbm*/
-    MagCnst(magCntxt.srcBox,&magCntxt.srcPos);
-    if (magOn) {
-    	mf.x = magCntxt.magPos.x;
-	mf.y = magCntxt.magPos.y;
-	mf.w = UnMag(magCntxt.magBox->w);
-	mf.h = UnMag(magCntxt.magBox->h);
+    MagCnst( magCntxt.srcBox, &magCntxt.srcPos );
+    if ( magOn ) {
+        mf.x = magCntxt.magPos.x;
+        mf.y = magCntxt.magPos.y;
+        mf.w = UnMag( magCntxt.magBox->w );
+        mf.h = UnMag( magCntxt.magBox->h );
 
-	BoxBeInside(&mf,&screenBox);
-	magCntxt.magPos.x = mf.x;
-	magCntxt.magPos.y = mf.y;
+        BoxBeInside( &mf, &screenBox );
+        magCntxt.magPos.x = mf.x;
+        magCntxt.magPos.y = mf.y;
 
-	if (magCntxt.magPos.x < magCntxt.srcPos.x)
-	    { srcChg = YES; magCntxt.srcPos.x = magCntxt.magPos.x; }
+        if ( magCntxt.magPos.x < magCntxt.srcPos.x )                                                                                                                                                                                      {
+ srcChg = YES; magCntxt.srcPos.x = magCntxt.magPos.x; }
 	
 	if (magCntxt.magPos.y < magCntxt.srcPos.y)
 	    { srcChg = YES; magCntxt.srcPos.y = magCntxt.magPos.y; }

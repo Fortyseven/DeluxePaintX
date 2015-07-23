@@ -15,43 +15,43 @@
 
 #ifdef method1
 /* CLIPPED stretch by integer multiple in X and Y direction --
-    
-    This version does the final y-stretch by "tricking" BltBitMap into 
-    outputting each line N times in one call. It requires H calls to 
-    BltBitMap, wher H is the number of "fat bit" scan lines visible in 
-    the clipping window.   It is thus slow for small magnifications, 
-    but quite fast for high magnifications.  Even at small 
-    magnifications the updates have a much smoother appearance than the 
-    other algorithm. */
-    
-short MagBits(sbm,sbox,dbm,dx,dy,NX,NY,clip)
-    struct BitMap *sbm, *dbm;
-    Box *sbox;
-    int dx,dy;	/* upper left corner in dbm */
-    int NX,NY;		/* magnify factor */
-    Box *clip;		/* clip box in destination bm */
-    {
-    SHORT xs,xd,yd,ys,sxmax,i,nout,lx,clymax, depth,bpr,nrep,ydcl;
-    static SHORT dw;
-    static Box c,fr;
-    struct BitMap tmpBM,tmpBM2;
-    depth = dbm->Depth;
-    
-    /* clip in source bitmap to avoid unnecessary work */
-    
-    fr.x = (clip->x - dx)/NX  + sbox->x;
-    fr.y = (clip->y - dy)/NY  + sbox->y;
-    fr.w = (clip->w + NX - 1)/NX;
-    fr.h = (clip->h + NY - 1)/NY;
-    
-    if (!BoxAnd(&c,&fr,sbox)) return(0);
 
-    dx += NX*(c.x - sbox->x);
-    dy += NY*(c.y - sbox->y);
+    This version does the final y-stretch by "tricking" BltBitMap into
+    outputting each line N times in one call. It requires H calls to
+    BltBitMap, wher H is the number of "fat bit" scan lines visible in
+    the clipping window.   It is thus slow for small magnifications,
+    but quite fast for high magnifications.  Even at small
+    magnifications the updates have a much smoother appearance than the
+    other algorithm. */
+
+short MagBits( sbm, sbox, dbm, dx, dy, NX, NY, clip )
+struct BitMap *sbm, *dbm;
+Box *sbox;
+int dx, dy;	/* upper left corner in dbm */
+int NX, NY;		/* magnify factor */
+Box *clip;		/* clip box in destination bm */
+{
+    SHORT xs, xd, yd, ys, sxmax, i, nout, lx, clymax, depth, bpr, nrep, ydcl;
+    static SHORT dw;
+    static Box c, fr;
+    struct BitMap tmpBM, tmpBM2;
+    depth = dbm->Depth;
+
+    /* clip in source bitmap to avoid unnecessary work */
+
+    fr.x = ( clip->x - dx ) / NX + sbox->x;
+    fr.y = ( clip->y - dy ) / NY + sbox->y;
+    fr.w = ( clip->w + NX - 1 ) / NX;
+    fr.h = ( clip->h + NY - 1 ) / NY;
+
+    if ( !BoxAnd( &c, &fr, sbox ) ) return( 0 );
+
+    dx += NX*( c.x - sbox->x );
+    dy += NY*( c.y - sbox->y );
     dw = c.w*NX;
 
-    if ( (NX==1)&&(NY==1)) 
-      { BltBitMap(sbm,c.x,c.y,dbm,dx,dy,c.w,c.h,REPOP,0xff,NULL); return(0); }
+    if ( ( NX == 1 ) && ( NY == 1 ) )                                                                                                                                                                                      {
+ BltBitMap(sbm,c.x,c.y,dbm,dx,dy,c.w,c.h,REPOP,0xff,NULL); return(0); }
     
     tmpBM.Planes[0] = tmpBM2.Planes[0] = 0;
 

@@ -118,9 +118,9 @@ typedef SHORT PaintMode;
 /*  Graphics Data Structures						*/
 /*----------------------------------------------------------------------*/
 typedef LONG LongFrac;
-typedef struct { SHORT x,y; } Point;
-typedef struct { SHORT w,h; } Dims;
-typedef struct { SHORT x,y,w,h; } Box;
+typedef struct { SHORT x, y; } Point;
+typedef struct { SHORT w, h; } Dims;
+typedef struct { SHORT x, y, w, h; } Box;
 
 #ifndef GRAPHICS_GFX_H
 #include <graphics\gfx.h>
@@ -146,15 +146,16 @@ typedef struct { Box box; struct BitMap *bm; } BoxBM;
 /*----------------------------------------------------------------------*/
 #define SHOWING 1
 #define TOOBIGTOPAINT 2
-typedef struct {
-    BoxBM pict,save;
+typedef struct
+{
+    BoxBM pict, save;
     UBYTE *mask;
-    SHORT xoffs,yoffs;
+    SHORT xoffs, yoffs;
     UBYTE flags;
     UBYTE xpcolor;
     UBYTE minTerm;
-    UBYTE planeUse,planeDef;
-    } BMOB;
+    UBYTE planeUse, planeDef;
+} BMOB;
 
 #define INITBMOB { INITBoxBM, INITBoxBM, NULL, 0, 0, NO, 0, COOKIEOP, 0xff, 0 }
 
@@ -166,20 +167,21 @@ typedef struct {
 #define HANGON 2
 #define BORDER 4
 
-typedef void (*ProcHandle)();
+typedef void( *ProcHandle )( );
 
-typedef struct Pane0 {
+typedef struct Pane0
+{
     USHORT flags;
     Box box;
-    ProcHandle charProc,mouseProc,paintProc;
+    ProcHandle charProc, mouseProc, paintProc;
     ULONG client;
     struct Pane0 *next;
-    } Pane;
-    
-/* mouse events: you can choose to be called when the program loops 
+} Pane;
+
+/* mouse events: you can choose to be called when the program loops
    even though the mouse didnt move */
 
-typedef enum { NONE,LOOPED,MOVED,BDOWN,BUP,ENTER,LEAVE } MouseEvent;
+typedef enum { NONE, LOOPED, MOVED, BDOWN, BUP, ENTER, LEAVE } MouseEvent;
 
 /* ----- Activities -------*/
 #define	nullAct		0
@@ -226,20 +228,21 @@ typedef SHORT CursID;
 /*----------------------------------------------------------------------*/
 /*   Magnify Context							*/
 /*----------------------------------------------------------------------*/
-typedef struct {
+typedef struct
+{
     SHORT magN;		/* Magnification factor			*/
-    struct RastPort *srcRP;	/* The source RasterPort 		*/				
-    Box  *srcBox; 	 /* The clip box of source in its Raster */   	
+    struct RastPort *srcRP;	/* The source RasterPort 		*/
+    Box  *srcBox; 	 /* The clip box of source in its Raster */
     Point srcPos;	/* The position of the view box relative*/
-			/* to the backing bitmap 		*/
+    /* to the backing bitmap 		*/
     struct BitMap *magBM;	/* The magnify BitMap	 		*/
     Box *magBox; 	/* Clip Box of magnify view in magBM.	*/
     Point magPos;	/* The position of magnify view rel	*/
-			/* to backing bitmap 			*/
-    void (*updtProc)();   /* Procedure to call to update the 	*/
-			/* backing bitmap. (takes *Box as 	*/
-			/* parameter, BBM relative);		*/
-    } MagContext;
+    /* to backing bitmap 			*/
+    void( *updtProc )( );   /* Procedure to call to update the 	*/
+    /* backing bitmap. (takes *Box as 	*/
+    /* parameter, BBM relative);		*/
+} MagContext;
 
 
 /* kinds of window */
@@ -303,22 +306,23 @@ typedef struct {
 
 typedef UBYTE IMode;
 
-typedef struct {
+typedef struct
+{
     UWORD flags;	/* see below */
     UBYTE cursor;	/* what cursor to use */
     UBYTE activity;	/* ctr panel activity for this */
     UBYTE symNpoints;	/* number of points to be transformed*/
     IMode nextIMode;	/* for chaining */
-    void (*startProc)(); /* call this to plug mode procs*/
-    } IModeDesc;
+    void( *startProc )( ); /* call this to plug mode procs*/
+} IModeDesc;
 
 
 /* Flag Definitions */
 #define	PERM	1	/* for permanent modes */
 #define	NOGR 	(1<<1)	/* dont do grid for this mode */
 #define NOBR 	(1<<2)	/* this mode doesn't use the brush (e.g. frect )
-		this is used in determining how big of a rectangle has
-		been touched on the screen*/
+        this is used in determining how big of a rectangle has
+        been touched on the screen*/
 #define NOSYM	(1<<3)	/* dont do symmetry at all */
 #define	SYMUP	(1<<4)	/* show symmetry feedback when button is up*/
 #define SYMDN	(1<<5)	/* show symmetry feedback when button is down*/
@@ -339,12 +343,13 @@ typedef struct {
 /*----------------------------------------------------------------------*/
 #define MAXNCOLORS 32
 #define MAXNCYCS 4
-typedef struct {
+typedef struct
+{
     SHORT count;
     SHORT rate;
     BOOL active;
-    UBYTE low,high;	/* bounds of range */
-    } Range;
+    UBYTE low, high;	/* bounds of range */
+} Range;
 
 
 /*----------------------------------------------------------------------*/
@@ -365,29 +370,31 @@ extern BOOL haveWBench;
 /* A typical client.*/
 /* Usage: PaletteTool(struct Window *, PaletteGlobals *);          	*/
 
-typedef struct {
+typedef struct
+{
     WORD paletteX, paletteY;
-	/* LeftEdge,TopEdge for palette window.
-    	 * Client can change these to force window to appear elsewhere.
-     	* If user drags window, these are updated before return to client.*/
+    /* LeftEdge,TopEdge for palette window.
+         * Client can change these to force window to appear elsewhere.
+         * If user drags window, these are updated before return to client.*/
     WORD paletteRange;		/* Index of range currently examined.*/
     Range *ranges;		/* LIM_RANGES Range's */
-    } PaletteGlobals;
+} PaletteGlobals;
 
 
 /*----------------------------------------------------------------------*/
 /*  Blitter registers							*/
 /*----------------------------------------------------------------------*/
 
-typedef struct {
-    USHORT	bltcon0,bltcon1,fwmask,lwmask;
-    UBYTE	*bltptc,*bltptb,*bltpta,*bltptd;
+typedef struct
+{
+    USHORT	bltcon0, bltcon1, fwmask, lwmask;
+    UBYTE	*bltptc, *bltptb, *bltpta, *bltptd;
     USHORT	bltsize;
-    SHORT	ioskip2[3];
-    SHORT	bltmdc,bltmdb,bltmda,bltmdd;
-    SHORT	ioskip3[4];
-    USHORT	cdata,bdata,adata;
-    } BlitterRegs;
+    SHORT	ioskip2[ 3 ];
+    SHORT	bltmdc, bltmdb, bltmda, bltmdd;
+    SHORT	ioskip3[ 4 ];
+    USHORT	cdata, bdata, adata;
+} BlitterRegs;
 
 /*----------------------------------------------------------------------*/
 /*  DID types ( for UNDO )						*/
@@ -406,10 +413,11 @@ typedef struct {
 #define OVS_SMART 1
 #define OVS_LOAD_ALL 2
 
-typedef struct {
+typedef struct
+{
     LONG type;
-    void (*sleepCursor)();
-    void (*wakeCursor)();
-    void (*panic)();
-    } OVSInfo;
-    
+    void( *sleepCursor )( );
+    void( *wakeCursor )( );
+    void( *panic )( );
+} OVSInfo;
+
