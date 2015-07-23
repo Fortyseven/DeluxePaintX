@@ -147,10 +147,10 @@ local UBYTE *picpths[ 3 ] = { "lo-res", "med-res", "hi-res" };
 InitPicPath() { strcpy( picpath, picpths[ curFormat ] ); }
 
 extern struct BitMap *clientBitMap;
-extern DPHook *dphook;
-extern BOOL myDPHook;
+//FIXME: extern DPHook *dphook;
+//FIXME: extern BOOL myDPHook;
 extern UBYTE DPName[];
-extern BOOL largeMemory;
+//FIXME: extern BOOL largeMemory;
 extern BOOL loadAFile;
 
 #ifdef DOWB
@@ -193,22 +193,24 @@ int DPInit( int argc, char *argv[] )
 
     /* -----  See if Deluxe Video or anybody has planted hook */
 
-    dphook = (DPHook *) FindHook( DPName );
+    //FIXME: dphook = (DPHook *) FindHook( DPName );
 
-    if ( ( dphook != NULL )/*&&largeMemory*/ ) {
-        //fmt = dphook->format;
-        //clientBitMap = dphook->bitmap;
+    //FIXME: 
+    //if ( ( dphook != NULL )/*&&largeMemory*/ ) {
+    //    //fmt = dphook->format;
+    //    //clientBitMap = dphook->bitmap;
 
-        //if ( clientBitMap != NULL ) {
-        //    hidbm = *clientBitMap; /* copy record, not pointer */
-        //    deep = MIN( hidbm.Depth, 5 );
-        //    doOverlay = YES;
-        //}
-        //else {
-        //    InfoMessage( " Null Client", " Bitmap" );
-        //}
-    }
-    else {
+    //    //if ( clientBitMap != NULL ) {
+    //    //    hidbm = *clientBitMap; /* copy record, not pointer */
+    //    //    deep = MIN( hidbm.Depth, 5 );
+    //    //    doOverlay = YES;
+    //    //}
+    //    //else {
+    //    //    InfoMessage( " Null Client", " Bitmap" );
+    //    //}
+    //}
+    //else 
+    {
         if ( argc > 1 ) {
             switch ( *argv[ 1 ] ) {
                 case 'l': fmt = 0; break;

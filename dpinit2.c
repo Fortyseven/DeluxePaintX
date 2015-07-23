@@ -25,7 +25,8 @@ SHORT curMIH;
 
 SHORT ComWidth() { return( (SHORT) ( ( curFormat > 0 ) ? COMMWIDTH : LOWCOMMWIDTH ) ); }
 
-SHORT MaxMiLength( mi ) struct MenuItem *mi; {
+SHORT MaxMiLength( struct MenuItem *mi )
+{
     struct IntuiText *it;
     SHORT w, max;
     for ( max = 0; mi != NULL; mi = mi->NextItem ) {
@@ -38,7 +39,8 @@ SHORT MaxMiLength( mi ) struct MenuItem *mi; {
     return( (SHORT) ( max - 10 ) );
 }
 
-InitMItems( mi, minW ) struct MenuItem *mi; SHORT minW; {
+void InitMItems( struct MenuItem *mi, SHORT minW )
+{
     SHORT i, y, x;
     SHORT wid = MAX( MaxMiLength( mi ) /*+widCorrect[curFormat]*/, minW );
     y = mi->TopEdge;
@@ -57,24 +59,21 @@ InitMItems( mi, minW ) struct MenuItem *mi; SHORT minW; {
     }
 }
 
-
-InitMenu()
+void InitMenu()
 {
     SHORT i = 0, xl = PMapX( 12 );
     struct Menu *mn = MainMenu;
+
     curMIH = menuHeight[ curFormat ];
+
     for ( mn = menus; mn != NULL; ++i, mn = mn->NextMenu ) {
         mn->LeftEdge = xl;
-        mn->Width = TextLength( screen->BarLayer->rp,
-                                mn->MenuName, strlen( mn->MenuName ) ) +
-                                widCorrect[ curFormat ] + fudgeFact;
+        mn->Width = TextLength( screen->BarLayer->rp, mn->MenuName, strlen( mn->MenuName ) ) + widCorrect[ curFormat ] + fudgeFact;
         xl += mn->Width;
         mn->Flags = MENUENABLED;
         InitMItems( mn->FirstItem, mn->Width );
     }
 }
-
-
 
 /* ----------------- Control Panel Inititialization -------------------*/
 
@@ -92,12 +91,14 @@ extern void mainCproc(), ColWPaint();
 
 /* Initialize the control panel geometry and create Windows */
 
-CPInit()
+void CPInit()
 {
     Box bx;
     SHORT colBoxH;
+
     cpShowing = NO;
     NXMag = NYMag = 1;
+
     if ( curFormat == 2 ) NYMag = 2;
     if ( curFormat != 0 ) NXMag = 2;
 
@@ -116,14 +117,11 @@ CPInit()
     colUW = ( cpWidth - 1 ) / colNColumns;
     penUW = ( cpWidth - 1 ) / 3;
     actUW = ( cpWidth - 1 ) / 2;
-    PaneCreate( &penwin, MakeBox( &bx, 0, 0, cpWidth, penH ), HANGON, &mainCproc,
-                penMproc, PenWPaint, NULL );
-    PaneCreate( &actwin, MakeBox( &bx, 0, penH, cpWidth, actH ), HANGON, &mainCproc, actMproc,
-                ActWPaint, NULL );
-    PaneCreate( &cdspwin, MakeBox( &bx, 0, penH + actH, cpWidth, colDspH ), HANGON, &mainCproc,
-                cDspMproc, cDspPaint, NULL );
-    PaneCreate( &colwin, MakeBox( &bx, 0, penH + actH + colDspH, cpWidth, colBoxH ), HANGON,
-                mainCproc, colMproc, ColWPaint, NULL );
+
+    PaneCreate( &penwin, MakeBox( &bx, 0, 0, cpWidth, penH ), HANGON, &mainCproc, penMproc, PenWPaint, NULL );
+    PaneCreate( &actwin, MakeBox( &bx, 0, penH, cpWidth, actH ), HANGON, &mainCproc, actMproc, ActWPaint, NULL );
+    PaneCreate( &cdspwin, MakeBox( &bx, 0, penH + actH, cpWidth, colDspH ), HANGON, &mainCproc, cDspMproc, cDspPaint, NULL );
+    PaneCreate( &colwin, MakeBox( &bx, 0, penH + actH + colDspH, cpWidth, colBoxH ), HANGON, mainCproc, colMproc, ColWPaint, NULL );
 }
 
 
