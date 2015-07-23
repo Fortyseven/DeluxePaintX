@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{5BC63353-D8F6-4DF7-8A7C-4436F3F6DB87}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="actbms.c" />
+    <ClCompile Include="airbrush.c" />
+    <ClCompile Include="bend.c" />
+    <ClCompile Include="bitmaps.c" />
+    <ClCompile Include="blend.c" />
+    <ClCompile Include="blitops.c" />
+    <ClCompile Include="bmob.c" />
+    <ClCompile Include="box.c" />
+    <ClCompile Include="brxform.c" />
+    <ClCompile Include="ccycle.c" />
+    <ClCompile Include="chproc.c" />
+    <ClCompile Include="clip.c" />
+    <ClCompile Include="conic.c" />
+    <ClCompile Include="ctrpan.c" />
+    <ClCompile Include="curbrush.c" />
+    <ClCompile Include="cursbms.c" />
+    <ClCompile Include="cursor.c" />
+    <ClCompile Include="dalloc.c" />
+    <ClCompile Include="dispnum.c" />
+    <ClCompile Include="distance.c" />
+    <ClCompile Include="dopalett.c" />
+    <ClCompile Include="dosymreq.c" />
+    <ClCompile Include="dotbms.c" />
+    <ClCompile Include="dpiff.c" />
+    <ClCompile Include="dpinit.c" />
+    <ClCompile Include="dpinit2.c" />
+    <ClCompile Include="dpio.c" />
+    <ClCompile Include="fill.c" />
+    <ClCompile Include="fnbms.c" />
+    <ClCompile Include="fnreq.c" />
+    <ClCompile Include="fontinit.c" />
+    <ClCompile Include="geom.c" />
+    <ClCompile Include="hook.c" />
+    <ClCompile Include="hsv.c" />
+    <ClCompile Include="iffr.c" />
+    <ClCompile Include="iffw.c" />
+    <ClCompile Include="ilbmr.c" />
+    <ClCompile Include="ilbmw.c" />
+    <ClCompile Include="initovs.c" />
+    <ClCompile Include="initread.c" />
+    <ClCompile Include="initwrit.c" />
+    <ClCompile Include="keyjunk.c" />
+    <ClCompile Include="magbits.c" />
+    <ClCompile Include="magops.c" />
+    <ClCompile Include="magwin.c" />
+    <ClCompile Include="mainmag.c" />
+    <ClCompile Include="makeicon.c" />
+    <ClCompile Include="maskblit.c" />
+    <ClCompile Include="menu.c" />
+    <ClCompile Include="message.c" />
+    <ClCompile Include="modes.c" />
+    <ClCompile Include="mousebut.c" />
+    <ClCompile Include="packerf.c" />
+    <ClCompile Include="paintw.c" />
+    <ClCompile Include="palbms.c" />
+    <ClCompile Include="palette.c" />
+    <ClCompile Include="pane.c" />
+    <ClCompile Include="penmenu.c" />
+    <ClCompile Include="pgraph.c" />
+    <ClCompile Include="polyf.c" />
+    <ClCompile Include="polyh.c" />
+    <ClCompile Include="print.c" />
+    <ClCompile Include="prism.c" />
+    <ClCompile Include="psym.c" />
+    <ClCompile Include="random.c" />
+    <ClCompile Include="remap.c" />
+    <ClCompile Include="reqcom.c" />
+    <ClCompile Include="rot90.c" />
+    <ClCompile Include="rotate.c" />
+    <ClCompile Include="shade.c" />
+    <ClCompile Include="shear.c" />
+    <ClCompile Include="spare.c" />
+    <ClCompile Include="stretch.c" />
+    <ClCompile Include="symreq.c" />
+    <ClCompile Include="temp\ACTBMS.C" />
+    <ClCompile Include="temp\AIRBRUSH.C" />
+    <ClCompile Include="temp\BEND.C" />
+    <ClCompile Include="temp\BITMAPS.C" />
+    <ClCompile Include="temp\BLEND.C" />
+    <ClCompile Include="temp\BLITOPS.C" />
+    <ClCompile Include="temp\BMOB.C" />
+    <ClCompile Include="temp\BOX.C" />
+    <ClCompile Include="temp\BRXFORM.C" />
+    <ClCompile Include="temp\CCYCLE.C" />
+    <ClCompile Include="temp\CHPROC.C" />
+    <ClCompile Include="temp\CLIP.C" />
+    <ClCompile Include="temp\CONIC.C" />
+    <ClCompile Include="temp\CTRPAN.C" />
+    <ClCompile Include="temp\CURBRUSH.C" />
+    <ClCompile Include="temp\CURSBMS.C" />
+    <ClCompile Include="temp\CURSOR.C" />
+    <ClCompile Include="temp\DALLOC.C" />
+    <ClCompile Include="temp\DISPNUM.C" />
+    <ClCompile Include="temp\DISTANCE.C" />
+    <ClCompile Include="temp\DOPALETT.C" />
+    <ClCompile Include="temp\DOSYMREQ.C" />
+    <ClCompile Include="temp\DOTBMS.C" />
+    <ClCompile Include="temp\DPIFF.C" />
+    <ClCompile Include="temp\DPINIT.C" />
+    <ClCompile Include="temp\DPINIT2.C" />
+    <ClCompile Include="temp\DPIO.C" />
+    <ClCompile Include="temp\FILL.C" />
+    <ClCompile Include="temp\FNBMS.C" />
+    <ClCompile Include="temp\FNREQ.C" />
+    <ClCompile Include="temp\FONTINIT.C" />
+    <ClCompile Include="temp\GEOM.C" />
+    <ClCompile Include="temp\HOOK.C" />
+    <ClCompile Include="temp\HSV.C" />
+    <ClCompile Include="temp\IFFR.C" />
+    <ClCompile Include="temp\IFFW.C" />
+    <ClCompile Include="temp\ILBMR.C" />
+    <ClCompile Include="temp\ILBMW.C" />
+    <ClCompile Include="temp\INITOVS.C" />
+    <ClCompile Include="temp\INITREAD.C" />
+    <ClCompile Include="temp\INITWRIT.C" />
+    <ClCompile Include="temp\KEYJUNK.C" />
+    <ClCompile Include="temp\MAGBITS.C" />
+    <ClCompile Include="temp\MAGOPS.C" />
+    <ClCompile Include="temp\MAGWIN.C" />
+    <ClCompile Include="temp\MAINMAG.C" />
+    <ClCompile Include="temp\MAKEICON.C" />
+    <ClCompile Include="temp\MASKBLIT.C" />
+    <ClCompile Include="temp\MENU.C" />
+    <ClCompile Include="temp\MESSAGE.C" />
+    <ClCompile Include="temp\MODES.C" />
+    <ClCompile Include="temp\MOUSEBUT.C" />
+    <ClCompile Include="temp\PACKERF.C" />
+    <ClCompile Include="temp\PAINTW.C" />
+    <ClCompile Include="temp\PALBMS.C" />
+    <ClCompile Include="temp\PALETTE.C" />
+    <ClCompile Include="temp\PANE.C" />
+    <ClCompile Include="temp\PENMENU.C" />
+    <ClCompile Include="temp\PGRAPH.C" />
+    <ClCompile Include="temp\POLYF.C" />
+    <ClCompile Include="temp\POLYH.C" />
+    <ClCompile Include="temp\PRINT.C" />
+    <ClCompile Include="temp\PRISM.C" />
+    <ClCompile Include="temp\PSYM.C" />
+    <ClCompile Include="temp\RANDOM.C" />
+    <ClCompile Include="temp\REMAP.C" />
+    <ClCompile Include="temp\REQCOM.C" />
+    <ClCompile Include="temp\ROT90.C" />
+    <ClCompile Include="temp\ROTATE.C" />
+    <ClCompile Include="temp\SHADE.C" />
+    <ClCompile Include="temp\SHEAR.C" />
+    <ClCompile Include="temp\SPARE.C" />
+    <ClCompile Include="temp\STRETCH.C" />
+    <ClCompile Include="temp\SYMREQ.C" />
+    <ClCompile Include="temp\TEXT.C" />
+    <ClCompile Include="temp\TIMER.C" />
+    <ClCompile Include="temp\UNPACKER.C" />
+    <ClCompile Include="text.c" />
+    <ClCompile Include="timer.c" />
+    <ClCompile Include="unpacker.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="blitregs.h" />
+    <ClInclude Include="dphook.h" />
+    <ClInclude Include="dpiff.h" />
+    <ClInclude Include="fnreq.h" />
+    <ClInclude Include="grdefs.h" />
+    <ClInclude Include="intuall.h" />
+    <ClInclude Include="packer.h" />
+    <ClInclude Include="plbm.h" />
+    <ClInclude Include="pnts.h" />
+    <ClInclude Include="prism.h" />
+    <ClInclude Include="system.h" />
+    <ClInclude Include="temp\BLITREGS.H" />
+    <ClInclude Include="temp\DPHOOK.H" />
+    <ClInclude Include="temp\DPIFF.H" />
+    <ClInclude Include="temp\FNREQ.H" />
+    <ClInclude Include="temp\GRDEFS.H" />
+    <ClInclude Include="temp\INTUALL.H" />
+    <ClInclude Include="temp\PACKER.H" />
+    <ClInclude Include="temp\PLBM.H" />
+    <ClInclude Include="temp\PNTS.H" />
+    <ClInclude Include="temp\PRISM.H" />
+    <ClInclude Include="temp\SYSTEM.H" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
