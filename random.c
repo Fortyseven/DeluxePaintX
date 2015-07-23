@@ -3,7 +3,7 @@
 /*			random.c				*/
 /*								*/
 /*--------------------------------------------------------------*/
-#include <exec\types.h>
+#include "types.h"
 
 /* ---- Random Number Generator ----- */
 

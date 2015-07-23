@@ -5,9 +5,9 @@
 /*----------------------------------------------------------------------*/
 
 #include <system.h>
-#include <librarie\dosexten.h>
+//#include <librarie\dosexten.h>
 #include <prism.h>
-#include <librarie\diskfont.h>
+//#include <librarie\diskfont.h>
 #include <dphook.h>
 
 #define local static
@@ -22,7 +22,7 @@ extern void ZZZCursor(), UnZZZCursor(), Panic();
 /* free up system memory which is in Limbo */
 #define MEGA (1<<20)
 
-FreeUpMem()
+void FreeUpMem()
 {
     UWORD *ptr = (UWORD *) AllocMem( MEGA, MEMF_PUBLIC );
     if ( ptr != NULL ) FreeMem( ptr, MEGA );
@@ -38,6 +38,7 @@ void OvsPrepare()
 {
     if ( loaded ) { UndoSave(); ZZZCursor(); }
 }
+
 void OvsEnd()
 {
     if ( loaded ) {
@@ -156,13 +157,14 @@ SHORT nFonts = 0;
 SHORT curFontNum = -1;
 struct TextFont *font = NULL;
 
-MyCloseFont( font ) struct TextFont *font; {
+void MyCloseFont( struct TextFont *font )
+{
     struct Node *nd;
     if ( font != NULL ) {
         if ( ( font->tf_Flags&( FPF_ROMFONT | FPF_DISKFONT ) ) == FPF_DISKFONT ) {
             nd = &font->tf_Message.mn_Node;
             if ( ( nd->ln_Pred->ln_Succ == nd ) &&
-                 ( nd->ln_Succ->ln_Pred == nd ) ) RemFont( font );
+                ( nd->ln_Succ->ln_Pred == nd ) ) RemFont( font );
         }
         CloseFont( font );
     }
@@ -180,8 +182,7 @@ BMOB origBr = { { INITBOX, &origBM }, { INITBOX, NULL },
 NULL, 0, 0, NO, 0, COOKIEOP, 0xff, 0 };
 SHORT curBrXform = NOXFORM;
 
-/* This gets rid of the "original" bitmap and sets the state to
-  " no transform" */
+/* This gets rid of the "original" bitmap and sets the state to "no transform" */
 ClearBrXform()
 {
     FreeBitMap( &origBM );
@@ -204,7 +205,8 @@ BOOL newSpare = YES;
 BOOL didMerge = NO;
 SHORT spareXPCol = 0;
 struct BitMap sparebm = { 0 };
-FreeSpare()
+
+void FreeSpare()
 {
     if ( spareThere ) FreeBitMap( &sparebm );
     spareThere = NO;
@@ -217,7 +219,7 @@ Point *polPnts = NULL;
 struct AreaInfo areaInfo;
 WORD *areaBuff = NULL;
 
-GunTheBrush()
+void GunTheBrush()
 {  /* dump the current brush to free storage */
     RestoreBrush();
     FreeBMOB( &curbr );
@@ -229,19 +231,20 @@ void Panic()
     GunTheBrush();
 }
 
-SetOverlay( tight ) BOOL tight;  {
+SetOverlay( BOOL tight )
+{
     ovsInfo.type = tight ? OVS_DUMB : OVS_LOAD_ALL;
     InitOVS( &ovsInfo );
 }
 
-
 /*---------- Copyright Notice ------------------*/
-DoText( s, x, y ) char *s; int x, y; {
+void DoText( char *s, int x, int y )
+{
     Move( &screenRP, x, y );
     Text( &screenRP, s, strlen( s ) );
 }
 
-CopyWText( x, y )
+void CopyWText( int x, int y )
 {
     DoText( "       -- Deluxe Paint --           ", x, y );
     DoText( "        by Daniel Silva             ", x, y + 30 );
@@ -250,41 +253,53 @@ CopyWText( x, y )
 
 #define CW_WIDTH  280
 #define CW_HEIGHT 120
-CopyWNotice()
+void CopyWNotice()
 {
     int x, y;
     x = ( screenBox.w - PMapX( 48 ) - CW_WIDTH ) / 2;
     y = ( screenBox.h - CW_HEIGHT ) / 2;
+
     SetOPen( &screenRP, 1 );
     SetAPen( &screenRP, 3 );
     RectFill( &screenRP, x, y, x + CW_WIDTH - 1, y + CW_HEIGHT - 1 );
+
     BNDRYOFF( &screenRP );
     SetAPen( &screenRP, 0 );
     SetDrMd( &screenRP, JAM1 );
+
     CopyWText( x + 6, y + 30 );
+
     SetAPen( &screenRP, 1 );
     CopyWText( x + 5, y + 29 );
 }
 
 
-/* -------------------------------------------------------- */
+/*----------------------------------------------------------------------*/
 struct Process *myProcess;
 struct Window *svWindowPtr;
 
 /*----------------------------------------------------------------------*/
-/* Yes, this is it, the MAIN PROGRAM:					*/
+/* Yes, this is it, the MAIN PROGRAM:                                   */
 /*----------------------------------------------------------------------*/
-main( argc, argv ) int argc; char *argv[]; {
+int main( int argc, char *argv[] )
+{
     DPInit( argc, argv );  /* initialization code */
+
     NewIMode( IM_draw );
     SetAirBRad( PMapX( 24 ) ); /* also brings in the drawing overlay*/
+
 #ifdef DOWB
     if (loadAFile) LoadPic();
 #endif
+
     CopyWNotice();
+
     loaded = YES;
+
     PListen(); 		/* this is the program */
+
     if ( !haveWBench ) BootIT();
+
     else CloseDisplay();
 }
 

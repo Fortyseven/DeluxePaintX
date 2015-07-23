@@ -123,7 +123,7 @@ typedef struct { SHORT w, h; } Dims;
 typedef struct { SHORT x, y, w, h; } Box;
 
 #ifndef GRAPHICS_GFX_H
-#include <graphics\gfx.h>
+//#include <graphics\gfx.h>
 #endif
 
 /*----------------------------------------------------------------------*/

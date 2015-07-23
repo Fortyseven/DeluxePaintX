@@ -4,7 +4,7 @@
 /*                                                                          */
 /****************************************************************************/
 #include <system.h>
-#include <librarie\dos.h>
+//#include <librarie\dos.h>
 
 #define NO 0
 #define YES 1
@@ -33,8 +33,7 @@ BOOL InitTimer( timermsg ) struct timerequest *timermsg; {
 /* Set the timer so we will be awakened later on                            */
 /*                                                                          */
 /****************************************************************************/
-SetTimer( timermsg, sec, micro )
-struct timerequest *timermsg; ULONG sec, micro;
+void SetTimer( struct timerequest *timermsg, ULONG sec, ULONG micro )
 {
     timermsg->tr_node.io_Command = TR_ADDREQUEST;
     timermsg->tr_time.tv_secs = sec;

@@ -48,8 +48,11 @@ local void AirBDots( x, y, proc ) SHORT x, y; void( *proc )( ); {
 
 local airbsplat()
 {
-    if ( symON )  AirBDots( mx, my, airbSym );
-    else  AirBDots( mx, my, mDispOB );
+    if ( symON )  {
+        AirBDots( mx, my, airbSym );
+    } else  {
+        AirBDots( mx, my, mDispOB );
+    }
     CycPaint();
 }
 
