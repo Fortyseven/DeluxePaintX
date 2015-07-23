@@ -4,9 +4,11 @@
 /*  									*/
 /*----------------------------------------------------------------------*/
 
-#include <system.h>
-#include <prism.h>
-#include <pnts.h>
+#include "system.h"
+#include "prism.h"
+#include "pnts.h"
+
+#define local 
 
 extern PointRec pnts;
 extern BOOL abortFlag, symON;
@@ -17,7 +19,7 @@ extern SHORT xShft, yShft;
 
 extern SHORT abRadius;
 
-local SHORT ab2Rad = 2 * INITABRADIUS, abRad2 = INITABRADIUS*INITABRADIUS;
+local SHORT ab2Rad = 2 * INITABRADIUS, abRad2 = INITABRADIUS * INITABRADIUS;
 
 /* ------ Air Brush Mode ------------------- */
 local Point abpt;
